@@ -1,0 +1,28 @@
+# Databases (regenerated from CSVs on first run)
+*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Large data files (download from Kaggle — see README)
+data/NationalNames.csv
+data/StateNames.csv
+data/full_data.csv
+
+# IDE
+.vscode/
+.idea/
+
+# Streamlit
+.streamlit/
+
+# Assignment PDF
+*.pdf
