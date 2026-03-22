@@ -249,26 +249,35 @@ st.markdown("""
         text-align: center;
     }
     .story-box {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        border-left: 4px solid #00b4d8;
-        padding: 1.5rem;
-        border-radius: 0 10px 10px 0;
+        background: linear-gradient(135deg, #0d2137 0%, #0a3356 100%);
+        border-left: 5px solid #00b4d8;
+        padding: 1.5rem 1.8rem;
+        border-radius: 0 12px 12px 0;
         margin: 1rem 0;
         font-style: italic;
+        color: #e0f4ff !important;
+        font-size: 1.05rem;
+        line-height: 1.7;
     }
     .challenge-box {
-        background: linear-gradient(135deg, #2d2d2d 0%, #0d1117 100%);
+        background: linear-gradient(135deg, #1a1200 0%, #2a1e00 100%);
         border: 2px solid #ffd700;
-        padding: 1.5rem;
-        border-radius: 10px;
+        padding: 1.5rem 1.8rem;
+        border-radius: 12px;
         margin: 1rem 0;
+        color: #fff5cc !important;
+        font-size: 1.05rem;
+        line-height: 1.7;
     }
     .hint-box {
-        background: #1a3a2a;
-        border-left: 4px solid #4ECDC4;
-        padding: 1rem;
+        background: #0d2a1e;
+        border-left: 5px solid #4ECDC4;
+        padding: 1rem 1.4rem;
         border-radius: 0 10px 10px 0;
         margin: 0.5rem 0;
+        color: #b2f0eb !important;
+        font-size: 1rem;
+        line-height: 1.6;
     }
     .success-animation {
         font-size: 3rem;
