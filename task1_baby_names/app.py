@@ -119,22 +119,25 @@ if tab == "📈 Name Popularity Over Time":
         mode = st.radio("Display mode:", ["Raw Count", "Percentage"], horizontal=True)
 
     if name_input:
+        names_list = [n.strip() for n in name_input.split(',')]
+        placeholders = ', '.join(['?'] * len(names_list))
+
         if mode == "Raw Count":
-            query = """
-                SELECT year, gender, SUM(count) as total
+            query = f"""
+                SELECT name, year, gender, SUM(count) as total
                 FROM baby_names
-                WHERE name = ? COLLATE NOCASE
-                GROUP BY year, gender
+                WHERE name COLLATE NOCASE IN ({placeholders})
+                GROUP BY name, year, gender
                 ORDER BY year
             """
-            df = run_query(query, [name_input])
+            df = run_query(query, names_list)
             if df.empty:
-                st.warning(f"No data found for name '{name_input}'")
+                st.warning(f"No data found for name(s) '{name_input}'")
             else:
-                fig = px.line(df, x='year', y='total', color='gender',
+                df['name_gender'] = df['name'] + ' (' + df['gender'] + ')'
+                fig = px.line(df, x='year', y='total', color='name_gender',
                               title=f"Popularity of '{name_input}' Over Time (Raw Count)",
-                              labels={'year': 'Year', 'total': 'Number of Babies', 'gender': 'Gender'},
-                              color_discrete_map={'F': '#FF6B6B', 'M': '#4ECDC4'})
+                              labels={'year': 'Year', 'total': 'Number of Babies', 'name_gender': 'Name (Gender)'})
                 fig.update_layout(template="plotly_dark", hovermode="x unified")
                 st.plotly_chart(fig, use_container_width=True)
 
@@ -144,11 +147,11 @@ if tab == "📈 Name Popularity Over Time":
                 peak_row = df.loc[df['total'].idxmax()]
                 col1.metric("Total Babies Named", f"{total_count:,}")
                 col2.metric("Peak Year", int(peak_row['year']))
-                col3.metric("Peak Count", f"{int(peak_row['total']):,}")
+                col3.metric("Peak Count", f"{int(peak_row['total']):,} ({peak_row['name_gender']})")
 
         else:  # Percentage mode
-            query = """
-                SELECT bn.year, bn.gender, 
+            query = f"""
+                SELECT bn.name, bn.year, bn.gender, 
                        SUM(bn.count) as name_count,
                        yearly.yearly_total,
                        ROUND(CAST(SUM(bn.count) AS REAL) / yearly.yearly_total * 100, 4) as percentage
@@ -158,18 +161,18 @@ if tab == "📈 Name Popularity Over Time":
                     FROM baby_names
                     GROUP BY year, gender
                 ) yearly ON bn.year = yearly.year AND bn.gender = yearly.gender
-                WHERE bn.name = ? COLLATE NOCASE
-                GROUP BY bn.year, bn.gender
+                WHERE bn.name COLLATE NOCASE IN ({placeholders})
+                GROUP BY bn.name, bn.year, bn.gender
                 ORDER BY bn.year
             """
-            df = run_query(query, [name_input])
+            df = run_query(query, names_list)
             if df.empty:
-                st.warning(f"No data found for name '{name_input}'")
+                st.warning(f"No data found for name(s) '{name_input}'")
             else:
-                fig = px.line(df, x='year', y='percentage', color='gender',
+                df['name_gender'] = df['name'] + ' (' + df['gender'] + ')'
+                fig = px.line(df, x='year', y='percentage', color='name_gender',
                               title=f"Popularity of '{name_input}' Over Time (% of All Babies)",
-                              labels={'year': 'Year', 'percentage': 'Percentage (%)', 'gender': 'Gender'},
-                              color_discrete_map={'F': '#FF6B6B', 'M': '#4ECDC4'})
+                              labels={'year': 'Year', 'percentage': 'Percentage (%)', 'name_gender': 'Name (Gender)'})
                 fig.update_layout(template="plotly_dark", hovermode="x unified")
                 st.plotly_chart(fig, use_container_width=True)
 
