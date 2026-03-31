@@ -188,57 +188,76 @@ elif tab == "🔍 Custom SQL Query Panel":
     st.subheader("Quick Examples")
     col1, col2, col3 = st.columns(3)
 
+    if "sql_query" not in st.session_state:
+        st.session_state.sql_query = "SELECT name, SUM(count) as total_births FROM baby_names WHERE year = 2000 GROUP BY name ORDER BY total_births DESC LIMIT 10"
+    if "last_run_query" not in st.session_state:
+        st.session_state.last_run_query = None
+
+    # Pre-built example buttons
+    st.subheader("Quick Examples")
+    col1, col2, col3 = st.columns(3)
+
     example_queries = {
-        "Top 10 Names (2014)": "SELECT name, SUM(count) as total FROM baby_names WHERE year = 2014 GROUP BY name ORDER BY total DESC LIMIT 10",
-        "Gender-Neutral Names": "SELECT name, COUNT(DISTINCT gender) as genders, SUM(count) as total FROM baby_names GROUP BY name HAVING genders = 2 ORDER BY total DESC LIMIT 15",
-        "Names Starting with 'Z'": "SELECT name, SUM(count) as total FROM baby_names WHERE name LIKE 'Z%' GROUP BY name ORDER BY total DESC LIMIT 10"
+        "80s Top Boy Names": "SELECT name, SUM(count) as total FROM baby_names WHERE gender = 'M' AND year BETWEEN 1980 AND 1989 GROUP BY name ORDER BY total DESC LIMIT 5",
+        "Total Births by Year": "SELECT year, SUM(count) as total_births FROM baby_names GROUP BY year ORDER BY year",
+        "All-Time Gender Split": "SELECT gender, SUM(count) as total FROM baby_names GROUP BY gender"
     }
 
-    selected_example = None
     with col1:
-        if st.button("🏆 Top 10 Names (2014)"):
-            selected_example = example_queries["Top 10 Names (2014)"]
+        if st.button("👦 80s Top Boy Names"):
+            st.session_state.sql_query = example_queries["80s Top Boy Names"]
     with col2:
-        if st.button("⚖️ Gender-Neutral Names"):
-            selected_example = example_queries["Gender-Neutral Names"]
+        if st.button("📈 Total Births by Year"):
+            st.session_state.sql_query = example_queries["Total Births by Year"]
     with col3:
-        if st.button("🔤 Names Starting with 'Z'"):
-            selected_example = example_queries["Names Starting with 'Z'"]
+        if st.button("⚖️ All-Time Gender Split"):
+            st.session_state.sql_query = example_queries["All-Time Gender Split"]
 
-    default_query = selected_example if selected_example else "SELECT name, SUM(count) as total FROM baby_names WHERE year = 2000 GROUP BY name ORDER BY total DESC LIMIT 10"
-    query_input = st.text_area("Enter your SQL query:", value=default_query, height=120)
+    query_input = st.text_area("Enter your SQL query:", key="sql_query", height=120)
 
     if st.button("▶ Run Query", type="primary"):
         # Safety check: only SELECT
         stripped = query_input.strip().upper()
         if not stripped.startswith("SELECT"):
             st.error("⚠️ Only SELECT queries are allowed! For safety, we don't permit INSERT, UPDATE, DELETE, DROP, or any other modification queries. Please write a SELECT query to explore the data.")
+            st.session_state.last_run_query = None
         else:
-            try:
-                result = run_query(query_input)
-                st.success(f"Query returned {len(result)} rows")
-                st.dataframe(result, use_container_width=True)
+            st.session_state.last_run_query = query_input
 
-                # Offer chart visualization if result has numeric columns
-                numeric_cols = result.select_dtypes(include='number').columns.tolist()
-                text_cols = result.select_dtypes(include='object').columns.tolist()
-                if len(numeric_cols) >= 1 and len(text_cols) >= 1:
-                    st.subheader("📊 Visualize Results")
+    if st.session_state.last_run_query:
+        try:
+            result = run_query(st.session_state.last_run_query)
+            st.success(f"Query returned {len(result)} rows")
+            st.dataframe(result, use_container_width=True)
+
+            # Offer chart visualization
+            numeric_cols = result.select_dtypes(include='number').columns.tolist()
+            all_cols = result.columns.tolist()
+            
+            # Require at least one numeric column, and at least 2 columns total
+            if len(numeric_cols) >= 1 and len(all_cols) >= 2:
+                st.subheader("📊 Visualize Results")
+                
+                chart_col1, chart_col2, chart_col3 = st.columns(3)
+                with chart_col1:
                     chart_type = st.selectbox("Chart type:", ["Bar", "Line", "Pie"])
-                    x_col = st.selectbox("X-axis:", text_cols)
-                    y_col = st.selectbox("Y-axis:", numeric_cols)
+                with chart_col2:
+                    y_col = st.selectbox("Y-axis (Numeric):", numeric_cols)
+                with chart_col3:
+                    x_cols_available = [c for c in all_cols if c != y_col]
+                    x_col = st.selectbox("X-axis/Labels:", x_cols_available)
 
-                    if chart_type == "Bar":
-                        fig = px.bar(result, x=x_col, y=y_col, title="Query Results",
-                                     color=y_col, color_continuous_scale="viridis")
-                    elif chart_type == "Line":
-                        fig = px.line(result, x=x_col, y=y_col, title="Query Results")
-                    else:
-                        fig = px.pie(result, names=x_col, values=y_col, title="Query Results")
-                    fig.update_layout(template="plotly_dark")
-                    st.plotly_chart(fig, use_container_width=True)
-            except Exception as e:
-                st.error(f"Query Error: {e}")
+                if chart_type == "Bar":
+                    fig = px.bar(result, x=x_col, y=y_col, title="Query Results")
+                elif chart_type == "Line":
+                    fig = px.line(result, x=x_col, y=y_col, title="Query Results", markers=True)
+                else: # Pie
+                    fig = px.pie(result, names=x_col, values=y_col, title="Query Results")
+                
+                fig.update_layout(template="plotly_dark")
+                st.plotly_chart(fig, use_container_width=True)
+        except Exception as e:
+            st.error(f"Query Error: {e}")
 
 # ============================================================
 # C: Name Diversity Over Time
