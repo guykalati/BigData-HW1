@@ -262,13 +262,24 @@ st.markdown("""
     background: linear-gradient(135deg, #0d1117, #161b22); border: 1px solid #30363d;
     border-radius: 10px; padding: 1rem; margin-bottom: 0.5rem;
 }
+.schema-card h4 {
+    color: #ffd700 !important;
+    margin-top: 0;
+}
+.schema-card pre {
+    color: #a8d8ea !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 0.85rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('''<div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Hogwarts_crest.svg/800px-Hogwarts_crest.svg.png" width="90">
+st.markdown('''<div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+    <span style="font-size: 2.2rem;">🦁🐍</span>
     <p class="main-title" style="margin:0;">Hogwarts School of SQL & Wizardry</p>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Hogwarts_crest.svg/800px-Hogwarts_crest.svg.png" width="90">
+    <span style="font-size: 2.2rem;">🦅🦡</span>
 </div>''', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Master the ancient art of SQL — one spell at a time ⚡</p>', unsafe_allow_html=True)
 
@@ -325,7 +336,7 @@ if nav == "📚 Grimoire (Schema)":
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("""<div class="schema-card"><h4>🐉 creatures</h4><pre style="color:#a8d8ea; font-size:0.85rem;">
+        st.markdown("""<div class="schema-card"><h4>🐉 creatures</h4><pre>
 id              INTEGER  PRIMARY KEY
 name            TEXT     creature name
 species         TEXT     Bird/Dragon/Beast/...
@@ -336,7 +347,7 @@ is_legendary    BOOLEAN  0 or 1
 discovered_by   TEXT     wizard who found it
 discovery_year  INTEGER  year discovered</pre></div>""", unsafe_allow_html=True)
 
-        st.markdown("""<div class="schema-card"><h4>✨ spells</h4><pre style="color:#a8d8ea; font-size:0.85rem;">
+        st.markdown("""<div class="schema-card"><h4>✨ spells</h4><pre>
 id          INTEGER  PRIMARY KEY
 name        TEXT     spell name
 element     TEXT     Fire/Ice/Water/...
@@ -346,7 +357,7 @@ damage      INTEGER  damage dealt
 wizard_id   INTEGER  FK → wizards.id</pre></div>""", unsafe_allow_html=True)
 
     with col2:
-        st.markdown("""<div class="schema-card"><h4>🧙 wizards</h4><pre style="color:#a8d8ea; font-size:0.85rem;">
+        st.markdown("""<div class="schema-card"><h4>🧙 wizards</h4><pre>
 id                INTEGER  PRIMARY KEY
 name              TEXT     wizard name
 house             TEXT     academy house
@@ -355,7 +366,7 @@ rank              TEXT     Apprentice-Archmage
 years_experience  INTEGER  years practicing
 creatures_tamed   INTEGER  creature count</pre></div>""", unsafe_allow_html=True)
 
-        st.markdown("""<div class="schema-card"><h4>⚔️ quests</h4><pre style="color:#a8d8ea; font-size:0.85rem;">
+        st.markdown("""<div class="schema-card"><h4>⚔️ quests</h4><pre>
 id           INTEGER  PRIMARY KEY
 title        TEXT     quest name
 difficulty   TEXT     Easy-Legendary
