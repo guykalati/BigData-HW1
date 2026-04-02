@@ -506,21 +506,22 @@ else:
                         st.markdown('<p class="spell-cast">✨🪄✨</p>', unsafe_allow_html=True)
                         st.success(f"🎉 Spell mastered! You have unlocked **{level_data['spell_name']}**!")
 
-                        attempts_count = st.session_state['attempts'].get(current, 0) + 1
-                        st.session_state['attempts'][current] = attempts_count
-                        bonus = max(0, level_data['xp'] - (attempts_count - 1) * 30)
-                        st.session_state['xp'] += bonus
-                        st.session_state['streak'] += 1
-                        st.session_state['completed_levels'].add(current)
-                        st.session_state['spells_unlocked'].append(level_data['spell_name'])
+                        # Only award XP if not already completed
+                        if current not in st.session_state['completed_levels']:
+                            attempts_count = st.session_state['attempts'].get(current, 0) + 1
+                            st.session_state['attempts'][current] = attempts_count
+                            bonus = max(0, level_data['xp'] - (attempts_count - 1) * 30)
+                            st.session_state['xp'] += bonus
+                            st.session_state['streak'] += 1
+                            st.session_state['completed_levels'].add(current)
+                            st.session_state['spells_unlocked'].append(level_data['spell_name'])
+                            st.info(f"🏅 +{bonus} XP earned! (Attempt #{attempts_count})")
+                            if st.session_state['streak'] >= 3:
+                                st.success(f"🔥 {st.session_state['streak']}-scroll streak! Your wand is ablaze!")
 
-                        st.info(f"🏅 +{bonus} XP earned! (Attempt #{attempts_count})")
-                        if st.session_state['streak'] >= 3:
-                            st.success(f"🔥 {st.session_state['streak']}-scroll streak! Your wand is ablaze!")
-
-                        if st.button("➡️ Next Scroll"):
-                            st.session_state['current_level'] = current + 1
-                            st.rerun()
+                        # Auto-advance: set next level and provide a rerun button
+                        st.session_state['current_level'] = current + 1
+                        st.button("➡️ Next Scroll", on_click=lambda: None)  # Just triggers rerun
                     else:
                         attempts_count = st.session_state['attempts'].get(current, 0) + 1
                         st.session_state['attempts'][current] = attempts_count
