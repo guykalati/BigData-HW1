@@ -336,7 +336,7 @@ if nav == "📚 Grimoire (Schema)":
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("""<div class="schema-card"><h4>🐉 creatures</h4><pre>
+        st.markdown("""<div class="schema-card"><h4>🐉 creatures</h4><div style="font-family: monospace; white-space: pre; color:#a8d8ea !important; font-size:0.85rem;">
 id              INTEGER  PRIMARY KEY
 name            TEXT     creature name
 species         TEXT     Bird/Dragon/Beast/...
@@ -345,35 +345,35 @@ power_level     INTEGER  strength rating
 habitat         TEXT     where it lives
 is_legendary    BOOLEAN  0 or 1
 discovered_by   TEXT     wizard who found it
-discovery_year  INTEGER  year discovered</pre></div>""", unsafe_allow_html=True)
+discovery_year  INTEGER  year discovered</div></div>""", unsafe_allow_html=True)
 
-        st.markdown("""<div class="schema-card"><h4>✨ spells</h4><pre>
+        st.markdown("""<div class="schema-card"><h4>✨ spells</h4><div style="font-family: monospace; white-space: pre; color:#a8d8ea !important; font-size:0.85rem;">
 id          INTEGER  PRIMARY KEY
 name        TEXT     spell name
 element     TEXT     Fire/Ice/Water/...
 difficulty  TEXT     Beginner-Expert
 mana_cost   INTEGER  mana needed
 damage      INTEGER  damage dealt
-wizard_id   INTEGER  FK → wizards.id</pre></div>""", unsafe_allow_html=True)
+wizard_id   INTEGER  FK → wizards.id</div></div>""", unsafe_allow_html=True)
 
     with col2:
-        st.markdown("""<div class="schema-card"><h4>🧙 wizards</h4><pre>
+        st.markdown("""<div class="schema-card"><h4>🧙 wizards</h4><div style="font-family: monospace; white-space: pre; color:#a8d8ea !important; font-size:0.85rem;">
 id                INTEGER  PRIMARY KEY
 name              TEXT     wizard name
 house             TEXT     academy house
 specialty         TEXT     magic type
 rank              TEXT     Apprentice-Archmage
 years_experience  INTEGER  years practicing
-creatures_tamed   INTEGER  creature count</pre></div>""", unsafe_allow_html=True)
+creatures_tamed   INTEGER  creature count</div></div>""", unsafe_allow_html=True)
 
-        st.markdown("""<div class="schema-card"><h4>⚔️ quests</h4><pre>
+        st.markdown("""<div class="schema-card"><h4>⚔️ quests</h4><div style="font-family: monospace; white-space: pre; color:#a8d8ea !important; font-size:0.85rem;">
 id           INTEGER  PRIMARY KEY
 title        TEXT     quest name
 difficulty   TEXT     Easy-Legendary
 reward_gold  INTEGER  gold reward
 creature_id  INTEGER  FK → creatures.id
 wizard_id    INTEGER  FK → wizards.id
-completed    BOOLEAN  0 or 1</pre></div>""", unsafe_allow_html=True)
+completed    BOOLEAN  0 or 1</div></div>""", unsafe_allow_html=True)
 
     st.divider()
     st.subheader("🔎 Data Preview")
