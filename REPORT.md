@@ -58,11 +58,11 @@ I handle edge cases like actors not found in the dataset (shows a warning), miss
 
 ### 2.3 Interesting Finds (10pt)
 
-**Finding 1: The 'Flawless Record' (Never Lost).** While getting nominated is hard, winning is harder. I queried the database to find people who have been nominated multiple times (3+) but have incredibly never lost an Oscar race, maintaining a 100% win rate. 
+**Finding 1: The Biggest Snubs.** I filtered the database to only competitive categories (acting, directing, writing, cinematography) and found the individuals with the most nominations who have never won. These are the most heartbreaking stories in Oscar history—repeatedly recognized as among the best, yet the trophy always eluded them.
 
-**Finding 2: The Versatile Visionaries.** By grouping nominations by distinct categories, I found the most versatile artists in cinematic history. These are people who don't just act or direct, but have been nominated across a wide array of completely different categories (writing, producing, composing, etc.).
+**Finding 2: The Versatile Visionaries.** Using a category whitelist and an interactive treemap visualization, I identified artists who have been nominated across the most distinct Oscar categories. Click on any artist in the treemap to zoom into their category breakdown.
 
-**Finding 3: The 'Longevity Legends' (Career Span).** In Hollywood, relevance is fleeting. To track consistency across decades, I measured the time gap between an artist's first Oscar nomination and their absolute latest one. These are the artists who hold the record for the longest career spans, continuing to earn Academy recognition across multiple generations of cinema.
+**Finding 3: The 'Decade Dominators'.** I calculated which artists have earned nominations across the most distinct decades. Staying relevant in Hollywood for one decade is hard—these individuals proved their talent transcends generational trends by earning recognition across 4, 5, or even 6 different decades.
 
 **Bonus: Did You Know?** I implemented a feature that generates personalized fun facts for any nominee via an autocomplete search bar. It calculates what percentile they rank in terms of nominations, shows their win rate, and summarizes their Oscar career span. I also included an "I'm Feeling Lucky" button to randomly select an interesting artist.
 

@@ -273,103 +273,134 @@ elif tab == "🔍 Interesting Finds":
     st.header("🔍 Interesting Finds")
 
     session = Session()
-    # Fetch all data to process safely in Python, completely avoiding SQLite anomalies
-    all_noms = session.query(OscarNomination).all()
-    session.close()
 
-    # Robust filter to guarantee no studios/military/teams are included
-    ignore_words = [
-        'NAVY', 'ARMY', 'STUDIO', 'CORPORATION', 'FOX', 'MGM', 'METRO-GOLDWYN', 'METRO GOLDWYN', 'WARNER',
-        'PARAMOUNT', 'DISNEY', '/', 'DEPARTMENT', 'PRODUCTIONS', 'ORCHESTRA', 'COMPANY', 'COLUMBIA', 'PICTURES'
+    # ---- CATEGORY WHITELIST APPROACH ----
+    # Instead of trying to blacklist bad names (which always misses edge cases),
+    # we whitelist the categories that are guaranteed to contain individual people.
+    PERSON_CATEGORIES = [
+        'ACTOR', 'ACTOR IN A LEADING ROLE', 'ACTOR IN A SUPPORTING ROLE',
+        'ACTRESS', 'ACTRESS IN A LEADING ROLE', 'ACTRESS IN A SUPPORTING ROLE',
+        'DIRECTING', 'DIRECTING (Comedy Picture)', 'DIRECTING (Dramatic Picture)',
+        'WRITING (Adapted Screenplay)', 'WRITING (Original Screenplay)',
+        'WRITING (Original Story)', 'WRITING (Adaptation)', 'WRITING', 'WRITING (Screenplay)',
+        'WRITING (Story and Screenplay)', 'WRITING (Motion Picture Story)',
+        'WRITING (Screenplay--Adapted)', 'WRITING (Screenplay--Original)',
+        'WRITING (Screenplay Based on Material from Another Medium)',
+        'WRITING (Screenplay Written Directly for the Screen)',
+        'WRITING (Screenplay--based on material from another medium)',
+        'WRITING (Story and Screenplay--written directly for the screen)',
+        'WRITING (Screenplay Based on Material Previously Produced or Published)',
+        'WRITING (Screenplay Adapted from Other Material)',
+        'WRITING (Story and Screenplay--based on material not previously published or produced)',
+        'WRITING (Story and Screenplay--based on factual material or material not previously published or produced)',
+        'WRITING (Screenplay Written Directly for the Screen--based on factual material or on story material not previously published or produced)',
+        'WRITING (Original Motion Picture Story)',
+        'CINEMATOGRAPHY', 'CINEMATOGRAPHY (Black-and-White)', 'CINEMATOGRAPHY (Color)',
+        'FILM EDITING', 'MUSIC (Original Score)', 'MUSIC (Original Song)',
+        'COSTUME DESIGN', 'COSTUME DESIGN (Black-and-White)', 'COSTUME DESIGN (Color)',
     ]
 
-    # Pre-process stats per person
+    all_noms = session.query(OscarNomination).filter(
+        OscarNomination.canon_category.in_(PERSON_CATEGORIES)
+    ).all()
+    session.close()
+
+    # Build per-person stats from whitelisted data only
     stats = {}
     categories_per_person = {}
     years_per_person = {}
-    
+
     for n in all_noms:
-        if any(w in n.name.upper() for w in ignore_words):
+        # Extra safety: skip any name containing '/' (multi-person credits)
+        if '/' in n.name:
             continue
-            
+
         name = n.name
         if name not in stats:
             stats[name] = {'noms': 0, 'wins': 0}
             categories_per_person[name] = set()
             years_per_person[name] = []
-            
+
         stats[name]['noms'] += 1
         if n.winner:
             stats[name]['wins'] += 1
-            
+
         categories_per_person[name].add(n.canon_category)
         years_per_person[name].append(n.year_ceremony)
 
-    # Find 1: The Flawless Record 
-    st.subheader("1. The 'Flawless Record' (Never Lost)")
-    flawless = [
-        {'Name': name, 'Unbeaten Nominations': data['wins']} 
-        for name, data in stats.items() 
-        if data['wins'] == data['noms'] and data['noms'] >= 3
+    # ---- Find 1: The Biggest Snubs (Most Noms Without a Win) ----
+    st.subheader("1. The Biggest Snubs (Most Nominations, Zero Wins)")
+    snubs = [
+        {'Name': name, 'Nominations': data['noms']}
+        for name, data in stats.items()
+        if data['wins'] == 0 and data['noms'] >= 3
     ]
-    flawless = sorted(flawless, key=lambda x: x['Unbeaten Nominations'], reverse=True)[:10]
+    snubs = sorted(snubs, key=lambda x: x['Nominations'], reverse=True)[:10]
 
-    df1 = pd.DataFrame(flawless)
-    fig1 = px.bar(df1, x='Name', y='Unbeaten Nominations',
-                  title="People with 3+ Nominations and a Flawless 100% Win Rate 🏆",
-                  color='Unbeaten Nominations', color_continuous_scale='Greens')
+    df1 = pd.DataFrame(snubs)
+    fig1 = px.bar(df1, x='Name', y='Nominations',
+                  title="The Biggest Oscar Snubs: Most Nominations Without a Single Win 😤",
+                  color='Nominations', color_continuous_scale='Reds')
     fig1.update_layout(template="plotly_dark")
     st.plotly_chart(fig1, use_container_width=True)
     st.markdown("""
-    **Finding:** Some rare individuals have a **flawless record**—they have been nominated multiple times 
-    and have literally *never lost*. These are artists whose work was considered so undeniably the best of 
-    the year that no opponent could beat them.
+    **Finding:** Being repeatedly nominated but never winning is one of the most heartbreaking 
+    stories in Oscar history. These actors, directors, and writers have been recognized multiple times 
+    as among the very best of the year—yet the final trophy has always eluded them. It highlights 
+    how competitive the Academy Awards truly are.
     """)
 
-    # Find 2: The Versatile Visionaries 
+    # ---- Find 2: Versatile Visionaries (Treemap) ----
     st.subheader("2. The Versatile Visionaries")
     versatile = [
-        {'Name': name, 'Unique Categories': len(cats), 'List': ", ".join(sorted(cats))}
+        {'Name': name, 'Unique Categories': len(cats), 'Categories': ", ".join(sorted(cats))}
         for name, cats in categories_per_person.items()
+        if len(cats) >= 2
     ]
     versatile = sorted(versatile, key=lambda x: x['Unique Categories'], reverse=True)[:10]
-    
-    df2 = pd.DataFrame(versatile)
-    # Improved Representation: Horizontal bar chart
-    fig2 = px.bar(df2, x='Unique Categories', y='Name', orientation='h', 
-                  text='Unique Categories', hover_data=['List'],
-                  title="Artists Nominated Across the Most Distinct Categories 🎭",
-                  color='Unique Categories', color_continuous_scale='Sunset')
-    fig2.update_traces(textposition='inside')
-    fig2.update_layout(yaxis={'categoryorder':'total ascending'}, template="plotly_dark")
+
+    # Treemap data: each person gets a box sized by their category count
+    treemap_data = []
+    for v in versatile:
+        for cat in categories_per_person[v['Name']]:
+            treemap_data.append({'Artist': v['Name'], 'Category': cat, 'Value': 1})
+    df2 = pd.DataFrame(treemap_data)
+    fig2 = px.treemap(df2, path=['Artist', 'Category'], values='Value',
+                      title="Versatile Artists and Their Oscar Categories 🎭",
+                      color_discrete_sequence=px.colors.qualitative.Set3)
+    fig2.update_layout(template="plotly_dark")
     st.plotly_chart(fig2, use_container_width=True)
     st.markdown("""
-    **Finding:** Most artists specialize, but a select few are true Renaissance people. By grouping 
-    nominations by *distinct* categories, we uncover the most versatile artists in cinematic history—
-    those who master the entire art of filmmaking (acting, directing, writing, producing).
+    **Finding:** Most artists specialize in one craft, but a select few are true Renaissance people. 
+    This treemap shows the top 10 most versatile Oscar nominees. Each colored block represents a 
+    distinct category they were nominated in—the more blocks, the more diverse their talent. Click 
+    on any artist to zoom in and see their full category breakdown.
     """)
 
-    # Find 3: The Longevity Legends (Career Span)
-    st.subheader("3. The 'Longevity Legends' (Longest Oscar Spans)")
-    longevity = []
+    # ---- Find 3: Decade Dominators ----
+    st.subheader("3. The 'Decade Dominators'")
+    decade_stats = {}
     for name, yrs in years_per_person.items():
-        if len(yrs) >= 2:
-            span = max(yrs) - min(yrs)
-            longevity.append({'Name': name, 'Span in Years': span, 'First Nom': min(yrs), 'Last Nom': max(yrs)})
-            
-    longevity = sorted(longevity, key=lambda x: x['Span in Years'], reverse=True)[:10]
-    df3 = pd.DataFrame(longevity)
-    
-    fig3 = px.bar(df3, x='Span in Years', y='Name', orientation='h',
-                  hover_data=['First Nom', 'Last Nom'], 
-                  title="Artists with the Longest Gap Between First and Last Nomination ⏳",
-                  color='Span in Years', color_continuous_scale='Teal')
-    fig3.update_layout(yaxis={'categoryorder':'total ascending'}, template="plotly_dark")
+        decades = set((y // 10) * 10 for y in yrs)
+        if len(decades) >= 2:
+            decade_stats[name] = {'Decades Active': len(decades), 'Total Noms': len(yrs),
+                                  'Decade List': ", ".join(f"{d}s" for d in sorted(decades))}
+
+    dominators = sorted(decade_stats.items(), key=lambda x: (x[1]['Decades Active'], x[1]['Total Noms']), reverse=True)[:10]
+    df3 = pd.DataFrame([{'Name': n, **d} for n, d in dominators])
+
+    fig3 = px.bar(df3, x='Decades Active', y='Name', orientation='h',
+                  text='Decades Active', hover_data=['Decade List', 'Total Noms'],
+                  title="Artists Nominated Across the Most Distinct Decades 📆",
+                  color='Total Noms', color_continuous_scale='Purples')
+    fig3.update_traces(textposition='inside')
+    fig3.update_layout(yaxis={'categoryorder': 'total ascending'}, template="plotly_dark")
     st.plotly_chart(fig3, use_container_width=True)
     st.markdown("""
-    **Finding:** In Hollywood, it's easy to be a flash in the pan. The hardest thing to do is maintain 
-    relevance across generations. These are the artists who hold the record for the absolute longest 
-    career spans, navigating decades of shifting industry trends while remaining consistently Academy-worthy!
+    **Finding:** Staying relevant in Hollywood for one decade is hard. Staying relevant across 
+    multiple decades is legendary. These artists didn't just have one era of greatness—they earned 
+    Oscar nominations across completely different decades, proving their talent transcends generational 
+    trends and shifting industry tastes.
     """)
 
 
@@ -381,27 +412,36 @@ elif tab == "🎲 Did You Know?":
 
     session = Session()
 
-    # Filter out studios natively for the dropdown list too
-    ignore_words = [
-        'NAVY', 'ARMY', 'STUDIO', 'CORPORATION', 'FOX', 'MGM', 'METRO', 'WARNER',
-        'PARAMOUNT', 'DISNEY', '/', 'DEPARTMENT', 'PRODUCTIONS', 'ORCHESTRA'
+    # Use the same whitelist approach for the dropdown
+    PERSON_CATEGORIES = [
+        'ACTOR', 'ACTOR IN A LEADING ROLE', 'ACTOR IN A SUPPORTING ROLE',
+        'ACTRESS', 'ACTRESS IN A LEADING ROLE', 'ACTRESS IN A SUPPORTING ROLE',
+        'DIRECTING', 'DIRECTING (Comedy Picture)', 'DIRECTING (Dramatic Picture)',
+        'WRITING (Adapted Screenplay)', 'WRITING (Original Screenplay)',
+        'WRITING (Original Story)', 'WRITING (Adaptation)', 'WRITING', 'WRITING (Screenplay)',
+        'CINEMATOGRAPHY', 'CINEMATOGRAPHY (Black-and-White)', 'CINEMATOGRAPHY (Color)',
+        'FILM EDITING', 'MUSIC (Original Score)', 'MUSIC (Original Song)',
+        'COSTUME DESIGN', 'COSTUME DESIGN (Black-and-White)', 'COSTUME DESIGN (Color)',
     ]
-    
-    raw_names = [r[0] for r in session.query(distinct(OscarNomination.name)).all()]
-    all_names = sorted([n for n in raw_names if not any(w in n.upper() for w in ignore_words)])
+
+    raw_names = [r[0] for r in session.query(distinct(OscarNomination.name)).filter(
+        OscarNomination.canon_category.in_(PERSON_CATEGORIES)
+    ).all()]
+    all_names = sorted([n for n in raw_names if '/' not in n])
 
     if "dyk_name" not in st.session_state:
         st.session_state.dyk_name = "Meryl Streep" if "Meryl Streep" in all_names else all_names[0]
 
     def set_random_name():
         import random
-        multi_noms = session.query(OscarNomination.name).group_by(OscarNomination.name).having(func.count(OscarNomination.id) > 1).all()
-        multi_list = sorted([r[0] for r in multi_noms if not any(w in r[0].upper() for w in ignore_words)])
+        multi_noms = session.query(OscarNomination.name).filter(
+            OscarNomination.canon_category.in_(PERSON_CATEGORIES)
+        ).group_by(OscarNomination.name).having(func.count(OscarNomination.id) > 1).all()
+        multi_list = sorted([r[0] for r in multi_noms if '/' not in r[0]])
         st.session_state.dyk_name = random.choice(multi_list) if multi_list else random.choice(all_names)
 
     col1, col2 = st.columns([3, 1])
     with col1:
-        # User input bound to session state
         name_input = st.selectbox("Select an actor/director for a fun fact:", options=all_names, key="dyk_name")
     with col2:
         st.write("")
@@ -409,49 +449,69 @@ elif tab == "🎲 Did You Know?":
         st.button("🎲 I'm Feeling Lucky", on_click=set_random_name, help="Randomly selects an interesting artist!")
 
     if name_input:
-        person_noms = session.query(func.count(OscarNomination.id)).filter(OscarNomination.name == name_input).scalar()
+        # Query only whitelisted categories for this person
+        person_noms_q = session.query(OscarNomination).filter(
+            OscarNomination.name == name_input,
+            OscarNomination.canon_category.in_(PERSON_CATEGORIES)
+        ).all()
+        person_noms = len(person_noms_q)
 
         if person_noms == 0:
             st.warning(f"No Oscar data found for '{name_input}'")
         else:
-            person_wins = session.query(func.count(OscarNomination.id)).filter(OscarNomination.name == name_input, OscarNomination.winner == True).scalar()
-            
+            person_wins = sum(1 for n in person_noms_q if n.winner)
+
             # Percentile logic
-            all_nom_counts = session.query(func.count(OscarNomination.id)).group_by(OscarNomination.name).all()
+            all_nom_counts = session.query(func.count(OscarNomination.id)).filter(
+                OscarNomination.canon_category.in_(PERSON_CATEGORIES)
+            ).group_by(OscarNomination.name).all()
             all_counts = sorted([x[0] for x in all_nom_counts])
             percentile = sum(1 for x in all_counts if x <= person_noms) / len(all_counts) * 100
 
-            categories = session.query(distinct(OscarNomination.canon_category)).filter(OscarNomination.name == name_input).all()
-            cat_list = [c[0] for c in categories]
-
-            first_year = session.query(func.min(OscarNomination.year_ceremony)).filter(OscarNomination.name == name_input).scalar()
-            last_year = session.query(func.max(OscarNomination.year_ceremony)).filter(OscarNomination.name == name_input).scalar()
+            cat_list = list(set(n.canon_category for n in person_noms_q))
+            years = [n.year_ceremony for n in person_noms_q]
+            first_year = min(years)
+            last_year = max(years)
             span = last_year - first_year
+            films = list(set(n.film for n in person_noms_q if n.film))
 
             # --- DYNAMIC RANDOM FACTS BANK ---
             import random
             facts = []
 
             # Fact 1: Percentile & Win Rate
-            p_text = f"placing them in the top {percentile:.0f}% of all Oscar-nominated individuals in history" if percentile > 50 else "making them a celebrated member of the Academy's elite"
-            w_text = f"They have successfully converted those into {person_wins} win(s)!" if person_wins > 0 else "However, they have yet to secure a win."
-            facts.append(f"**{name_input}** has {person_noms} total nominations, {p_text}. {w_text}")
+            p_text = f"placing them in the top **{percentile:.0f}%** of all Oscar-nominated individuals in history" if percentile > 50 else "making them a celebrated member of the Academy's elite"
+            w_text = f"They have successfully converted those into **{person_wins} win(s)**!" if person_wins > 0 else "However, they have yet to secure a win."
+            facts.append(f"**{name_input}** has **{person_noms}** competitive nominations, {p_text}. {w_text}")
 
             # Fact 2: Category Spread
             if len(cat_list) > 1:
-                facts.append(f"Extremely versatile, **{name_input}** has been nominated across **{len(cat_list)} distinct Oscar categories** throughout their career! These include: {', '.join(cat_list)}.")
+                facts.append(f"Extremely versatile, **{name_input}** has been nominated across **{len(cat_list)} distinct Oscar categories**: {', '.join(cat_list)}. That's rare—most people spend their entire career in just one!")
             else:
-                facts.append(f"A master of their specific craft, **{name_input}** has built an incredible and focused legacy strictly in the **{cat_list[0]}** category across all {person_noms} of their nominations.")
+                facts.append(f"A master of their craft, **{name_input}** has built their entire Oscar legacy in the **{cat_list[0]}** category, earning all {person_noms} of their nominations there.")
 
             # Fact 3: Career Longevity
             if span > 10:
-                facts.append(f"**{name_input}** has had incredible career longevity! Their Oscar journey spans over **{span} years**, from their very first recognition in {first_year} all the way to {last_year}.")
+                facts.append(f"Talk about staying power! **{name_input}**'s Oscar journey spans an incredible **{span} years**, from {first_year} all the way to {last_year}.")
             elif span == 0 and person_noms > 1:
-                facts.append(f"**{name_input}** accomplished the extremely rare feat of receiving {person_noms} simultaneous nominations in a single year ({first_year})!")
-                
+                facts.append(f"**{name_input}** pulled off the rare feat of receiving **{person_noms} nominations in the very same year** ({first_year})!")
+
             # Fact 4: Winning efficiency
             if person_wins > 0 and person_wins == person_noms:
-                facts.append(f"**{name_input}** has a flawless 100% win rate at the Oscars! Every single time they were nominated ({person_noms} times), they walked away with the prestigious trophy.")
+                facts.append(f"Incredible: **{name_input}** has a flawless **100% win rate** at the Oscars! They were nominated {person_noms} time(s) and won every single time.")
+            elif person_wins > 0:
+                win_rate = person_wins / person_noms * 100
+                facts.append(f"**{name_input}** has a **{win_rate:.0f}% win rate** ({person_wins} wins from {person_noms} nominations). For comparison, the average Oscar nominee wins about 20% of the time.")
+
+            # Fact 5: Film count
+            if len(films) > 3:
+                facts.append(f"Over their career, **{name_input}** has been recognized for their work in **{len(films)} different films** at the Oscars, including titles like *{films[0]}* and *{films[1]}*.")
+
+            # Fact 6: Decade spread
+            decades = set((y // 10) * 10 for y in years)
+            if len(decades) >= 3:
+                decade_str = ", ".join(f"{d}s" for d in sorted(decades))
+                facts.append(f"**{name_input}** has been nominated across **{len(decades)} different decades** ({decade_str}), proving their talent truly transcends generational trends.")
 
             # Pick a random fact to display
             selected_fact = random.choice(facts)
