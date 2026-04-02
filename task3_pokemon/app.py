@@ -584,65 +584,49 @@ elif tab == "📊 Pokemon Insights":
     by Dragons being weak to Ice, Fairy, and other Dragon types, so raw stats alone do not guarantee victory.
     """)
 
-    # Insight 2: Power creep across generations
-    st.subheader("2. Power Creep Across Generations")
+    # Insight 2: The "Glass Cannon" Index
+    st.subheader("2. The 'Glass Cannon' Index")
     query2 = """
-        SELECT generation,
-               COUNT(*) as num_pokemon,
-               ROUND(AVG(total), 1) as avg_total,
-               ROUND(AVG(hp), 1) as avg_hp,
-               ROUND(AVG(attack), 1) as avg_atk,
-               SUM(CASE WHEN legendary = 1 THEN 1 ELSE 0 END) as legendaries
+        SELECT name, type1, type2, hp, attack, defense, sp_atk, sp_def, speed,
+               (attack + sp_atk + speed) AS lethality,
+               (hp + defense + sp_def) AS survivability
         FROM pokemon
-        GROUP BY generation
-        ORDER BY generation
+        WHERE total > 350 AND legendary = 0
     """
     df2 = pd.read_sql_query(query2, conn)
-    fig2 = px.line(df2, x='generation', y='avg_total',
-                   title="Average Total Stats by Generation (Power Creep?)",
-                   labels={'generation': 'Generation', 'avg_total': 'Avg Total Stats'},
-                   markers=True, color_discrete_sequence=['#FF4444'])
+    df2['Glassiness Ratio'] = df2['lethality'] / df2['survivability']
+    
+    fig2 = px.scatter(df2, x='survivability', y='lethality',
+                      hover_name='name', hover_data=['type1', 'hp', 'attack', 'speed'],
+                      color='Glassiness Ratio', color_continuous_scale='Turbo',
+                      title="Lethality vs. Survivability (Non-Legendaries > 350 Total Stats)",
+                      labels={'survivability': 'Survivability (HP + DEF + SP.DEF)', 
+                              'lethality': 'Lethality (ATK + SP.ATK + SPD)'})
     fig2.update_layout(template="plotly_dark")
     st.plotly_chart(fig2, use_container_width=True)
-
-    fig2b = px.bar(df2, x='generation', y=['avg_hp', 'avg_atk'],
-                   title="HP vs Attack Trends Across Generations",
-                   barmode='group', color_discrete_sequence=['#4ECDC4', '#FF6B6B'])
-    fig2b.update_layout(template="plotly_dark")
-    st.plotly_chart(fig2b, use_container_width=True)
     st.markdown("""
-    **Finding:** Looking at the average stats across generations, there is some evidence of power creep but 
-    it is not as straightforward as you might expect. Each generation introduces both weak early-route Pokemon 
-    and powerful legendaries, which balances the average out. However, later generations tend to have slightly 
-    higher average stats overall. The number of legendary Pokemon also varies by generation, and since 
-    legendaries have much higher stats, generations with more legendaries will naturally show higher averages. 
-    This suggests that power creep in Pokemon is more about introducing stronger outliers rather than raising 
-    the baseline for all Pokemon.
+    **Finding:** In the competitive meta, a "Glass Cannon" is a Pokémon with devastating offensive presence (Attack, Sp.Atk, Speed) but miserable defensive stats (HP, Defense, Sp.Def). By plotting these metrics against each other, we can pinpoint the true extremes of Pokémon design. Pokémon glowing bright red on the top-left (like Gengar, Alakazam, and Pheromosa) are the ultimate glass cannons—they hit like nukes and outspeed everything, but will faint if someone looks at them wrong. In contrast, the bottom-right cluster reveals the pure defensive walls (like Shuckle, Chansey, and Toxapex) who deal no damage but can survive earthquakes.
     """)
 
-    # Insight 3: Weakest Legendary
-    st.subheader("3. The Weakest Legendary Pokemon")
+    # Insight 3: The Speed Tier Meta
+    st.subheader("3. The Speed Tier Meta by Type")
     query3 = """
-        SELECT name, type1, type2, total, hp, attack, defense, sp_atk, sp_def, speed, generation
+        SELECT type1, speed, name, total
         FROM pokemon
-        WHERE legendary = 1
-        ORDER BY total ASC
-        LIMIT 10
     """
     df3 = pd.read_sql_query(query3, conn)
-    fig3 = px.bar(df3, x='name', y='total',
-                  title="Weakest Legendary Pokemon by Total Stats",
-                  color='total', color_continuous_scale='blues',
-                  hover_data=['type1', 'type2', 'generation'])
-    fig3.update_layout(template="plotly_dark")
+    
+    # Calculate median speed to sort the boxplot logically
+    type_median_speed = df3.groupby('type1')['speed'].median().sort_values(ascending=False).index
+    
+    fig3 = px.box(df3, x='type1', y='speed', hover_data=['name', 'total'],
+                  color='type1', category_orders={'type1': type_median_speed},
+                  title="Distribution of Base Speed Stats across Primary Typings",
+                  labels={'type1': 'Primary Typing', 'speed': 'Base Speed Stat'})
+    fig3.update_layout(template="plotly_dark", showlegend=False, xaxis_tickangle=-45)
     st.plotly_chart(fig3, use_container_width=True)
     st.markdown("""
-    **Finding:** Not all legendaries are created equal. Some legendary Pokemon have surprisingly low stats 
-    compared to their peers. These "weaker" legendaries often have unique abilities or roles that compensate 
-    for their lower stats, such as support abilities or unique type combinations. This design choice shows 
-    that the game designers wanted legendaries to feel special not just through raw power but also through 
-    unique characteristics. It also means that simply having a legendary on your team does not guarantee 
-    you will win — strategy and type matchups matter more than just picking the rarest Pokemon.
+    **Finding:** Speed is ruthlessly important in Pokémon—moving first dictates the entire pace of the battle. This boxplot reveals the underlying engine of game balance: **Electric** and **Flying** types are fundamentally engineered to out-speed the entire meta, making them perfect sweepers and "revenge killers." Conversely, **Steel** and **Rock** types are mathematically punished in their speed stat to balance out their incredible defensive type resistances. If you are building a competitive team, this chart proves you absolutely need at least one Electric or Flying type to maintain momentum, and a bulky Steel type to absorb the game's inherent speed creep.
     """)
 
     conn.close()

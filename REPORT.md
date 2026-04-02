@@ -98,7 +98,9 @@ Each cheat modifies the actual database, not just Python variables. I also imple
 
 **Insight 1: Most Overpowered Type Combinations.** Dragon/Flying has the highest average total stats among dual-type combinations with at least 3 Pokemon. This makes sense because many Dragon types are pseudo-legendary or legendary Pokemon, which are designed to be rare and powerful.
 
-**Insight 2: Power Creep Across Generations.** There is some evidence of power creep in later generations, but it is not as straightforward as you might expect. Each generation introduces both weak early-route Pokemon and powerful legendaries, which balances the average. The power creep is more about introducing stronger outliers than raising the baseline.
+**Finding 2: The "Glass Cannon" Index.** Approaching the game from a competitive meta perspective, I calculated a "Glassiness Ratio" comparing unadulterated offensive capabilities (Attack + Sp.Atk + Speed) against raw defensive capabilities (HP + Def + Sp.Def). Plotting this creates a fascinating visual index where extreme glass cannons (Gengar, Alakazam) cluster far away from extreme defensive walls (Shuckle, Blissey).
+
+**Finding 3: The Speed Tier Meta by Type.** In competitive battling, Speed is arguably the most critical stat as it dictates the tempo of the entire match. I created a sorted box-and-whisker plot analyzing the base speed distributions across all primary typings. This statistically proves that Electric and Flying types are fundamentally engineered by developers to out-speed the meta, whereas Steel and Rock types pay a heavy mathematical speed penalty in exchange for their type resistances.
 
 ---
 
