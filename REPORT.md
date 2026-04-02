@@ -62,7 +62,7 @@ I handle edge cases like actors not found in the dataset (shows a warning), miss
 
 **Finding 2: The Versatile Visionaries.** By grouping nominations by distinct categories, I found the most versatile artists in cinematic history. These are people who don't just act or direct, but have been nominated across a wide array of completely different categories (writing, producing, composing, etc.).
 
-**Finding 3: The 'Double Threat' Phenomenon.** Some artists have pulled off the incredibly rare feat of being nominated multiple times in the exact same year. I wrote a complex grouped query to identify who has achieved this "Double Threat" status the most times across their career.
+**Finding 3: The 'Longevity Legends' (Career Span).** In Hollywood, relevance is fleeting. To track consistency across decades, I measured the time gap between an artist's first Oscar nomination and their absolute latest one. These are the artists who hold the record for the longest career spans, continuing to earn Academy recognition across multiple generations of cinema.
 
 **Bonus: Did You Know?** I implemented a feature that generates personalized fun facts for any nominee via an autocomplete search bar. It calculates what percentile they rank in terms of nominations, shows their win rate, and summarizes their Oscar career span. I also included an "I'm Feeling Lucky" button to randomly select an interesting artist.
 

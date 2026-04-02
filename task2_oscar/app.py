@@ -273,90 +273,105 @@ elif tab == "🔍 Interesting Finds":
     st.header("🔍 Interesting Finds")
 
     session = Session()
+    # Fetch all data to process safely in Python, completely avoiding SQLite anomalies
+    all_noms = session.query(OscarNomination).all()
+    session.close()
 
-    # Find 1: The Flawless Record (100% Win Rate with easiest multiple noms)
+    # Robust filter to guarantee no studios/military/teams are included
+    ignore_words = [
+        'NAVY', 'ARMY', 'STUDIO', 'CORPORATION', 'FOX', 'MGM', 'METRO-GOLDWYN', 'METRO GOLDWYN', 'WARNER',
+        'PARAMOUNT', 'DISNEY', '/', 'DEPARTMENT', 'PRODUCTIONS', 'ORCHESTRA', 'COMPANY', 'COLUMBIA', 'PICTURES'
+    ]
+
+    # Pre-process stats per person
+    stats = {}
+    categories_per_person = {}
+    years_per_person = {}
+    
+    for n in all_noms:
+        if any(w in n.name.upper() for w in ignore_words):
+            continue
+            
+        name = n.name
+        if name not in stats:
+            stats[name] = {'noms': 0, 'wins': 0}
+            categories_per_person[name] = set()
+            years_per_person[name] = []
+            
+        stats[name]['noms'] += 1
+        if n.winner:
+            stats[name]['wins'] += 1
+            
+        categories_per_person[name].add(n.canon_category)
+        years_per_person[name].append(n.year_ceremony)
+
+    # Find 1: The Flawless Record 
     st.subheader("1. The 'Flawless Record' (Never Lost)")
-    flawless = session.query(
-        OscarNomination.name,
-        func.count(OscarNomination.id).label('noms')
-    ).group_by(OscarNomination.name).having(
-        func.cast(func.sum(func.cast(OscarNomination.winner, Integer)), Integer) == func.count(OscarNomination.id)
-    ).having(
-        func.count(OscarNomination.id) >= 3
-    ).order_by(func.count(OscarNomination.id).desc()).limit(10).all()
+    flawless = [
+        {'Name': name, 'Unbeaten Nominations': data['wins']} 
+        for name, data in stats.items() 
+        if data['wins'] == data['noms'] and data['noms'] >= 3
+    ]
+    flawless = sorted(flawless, key=lambda x: x['Unbeaten Nominations'], reverse=True)[:10]
 
-    df1 = pd.DataFrame([(n.name, n.noms) for n in flawless], columns=['Name', 'Total Unbeaten Nominations'])
-    fig1 = px.bar(df1, x='Name', y='Total Unbeaten Nominations',
-                  title="People with 3+ Nominations and a 100% Win Rate 🏆",
-                  color='Total Unbeaten Nominations', color_continuous_scale='Greens')
+    df1 = pd.DataFrame(flawless)
+    fig1 = px.bar(df1, x='Name', y='Unbeaten Nominations',
+                  title="People with 3+ Nominations and a Flawless 100% Win Rate 🏆",
+                  color='Unbeaten Nominations', color_continuous_scale='Greens')
     fig1.update_layout(template="plotly_dark")
     st.plotly_chart(fig1, use_container_width=True)
     st.markdown("""
-    **Finding:** While getting nominated for an Oscar is hard, actually winning is even harder. But some rare 
-    individuals have a **flawless record**—they have been nominated multiple times and have literally *never lost*. 
-    These are artists whose work, whenever recognized by the Academy, was considered so undeniably the best of 
-    the year that no one could beat them.
+    **Finding:** Some rare individuals have a **flawless record**—they have been nominated multiple times 
+    and have literally *never lost*. These are artists whose work was considered so undeniably the best of 
+    the year that no opponent could beat them.
     """)
 
-    # Find 2: The Versatile Visionaries (Most distinct categories)
+    # Find 2: The Versatile Visionaries 
     st.subheader("2. The Versatile Visionaries")
-    versatile = session.query(
-        OscarNomination.name,
-        func.count(distinct(OscarNomination.canon_category)).label('cat_count'),
-        func.count(OscarNomination.id).label('total_noms')
-    ).group_by(OscarNomination.name).order_by(
-        func.count(distinct(OscarNomination.canon_category)).desc()
-    ).limit(10).all()
-
-    df2 = pd.DataFrame([(n.name, n.cat_count, n.total_noms) for n in versatile], 
-                       columns=['Name', 'Unique Categories', 'Total Nominations'])
-    fig2 = px.scatter(df2, x='Total Nominations', y='Unique Categories', color='Name', 
-                      size='Unique Categories', hover_name='Name',
-                      title="Artists Nominated Across the Most Distinct Categories 🎭")
-    fig2.update_traces(marker=dict(line=dict(width=2, color='white')))
-    fig2.update_layout(template="plotly_dark", showlegend=False)
+    versatile = [
+        {'Name': name, 'Unique Categories': len(cats), 'List': ", ".join(sorted(cats))}
+        for name, cats in categories_per_person.items()
+    ]
+    versatile = sorted(versatile, key=lambda x: x['Unique Categories'], reverse=True)[:10]
+    
+    df2 = pd.DataFrame(versatile)
+    # Improved Representation: Horizontal bar chart
+    fig2 = px.bar(df2, x='Unique Categories', y='Name', orientation='h', 
+                  text='Unique Categories', hover_data=['List'],
+                  title="Artists Nominated Across the Most Distinct Categories 🎭",
+                  color='Unique Categories', color_continuous_scale='Sunset')
+    fig2.update_traces(textposition='inside')
+    fig2.update_layout(yaxis={'categoryorder':'total ascending'}, template="plotly_dark")
     st.plotly_chart(fig2, use_container_width=True)
     st.markdown("""
-    **Finding:** Most actors or directors stay in their own lane, but a select few are true Renaissance people. 
-    By grouping nominations by *distinct* categories, we uncover the most versatile artists in cinematic history—
-    those who have been nominated for acting, directing, writing, and sometimes even producing or composing. 
-    These individuals aren't just great at one job; they master the entire art of filmmaking.
+    **Finding:** Most artists specialize, but a select few are true Renaissance people. By grouping 
+    nominations by *distinct* categories, we uncover the most versatile artists in cinematic history—
+    those who master the entire art of filmmaking (acting, directing, writing, producing).
     """)
 
-    # Find 3: The "Double Threat" Phenomenon (Multiple Noms in One Year)
-    st.subheader("3. The 'Double Threat' Phenomenon")
-    subq = session.query(
-        OscarNomination.name,
-        OscarNomination.year_ceremony,
-        func.count(OscarNomination.id).label('year_noms')
-    ).group_by(OscarNomination.name, OscarNomination.year_ceremony).having(
-        func.count(OscarNomination.id) > 1
-    ).subquery()
-
-    double_threats = session.query(
-        subq.c.name,
-        func.count(subq.c.year_ceremony).label('years_with_multiple_noms'),
-        func.max(subq.c.year_noms).label('max_in_one_year')
-    ).group_by(subq.c.name).order_by(
-        func.count(subq.c.year_ceremony).desc(), 
-        func.max(subq.c.year_noms).desc()
-    ).limit(10).all()
-
-    df3 = pd.DataFrame([(n.name, n.years_with_multiple_noms, n.max_in_one_year) for n in double_threats], 
-                       columns=['Name', 'Years with 2+ Noms', 'Most Noms in a Single Year'])
-    fig3 = px.bar(df3, x='Name', y='Years with 2+ Noms', hover_data=['Most Noms in a Single Year'], 
-                  title="Artists Nominated Multiple Times in the EXACT Same Year 📆", 
-                  color='Years with 2+ Noms', color_continuous_scale='Purples')
-    fig3.update_layout(template="plotly_dark")
+    # Find 3: The Longevity Legends (Career Span)
+    st.subheader("3. The 'Longevity Legends' (Longest Oscar Spans)")
+    longevity = []
+    for name, yrs in years_per_person.items():
+        if len(yrs) >= 2:
+            span = max(yrs) - min(yrs)
+            longevity.append({'Name': name, 'Span in Years': span, 'First Nom': min(yrs), 'Last Nom': max(yrs)})
+            
+    longevity = sorted(longevity, key=lambda x: x['Span in Years'], reverse=True)[:10]
+    df3 = pd.DataFrame(longevity)
+    
+    fig3 = px.bar(df3, x='Span in Years', y='Name', orientation='h',
+                  hover_data=['First Nom', 'Last Nom'], 
+                  title="Artists with the Longest Gap Between First and Last Nomination ⏳",
+                  color='Span in Years', color_continuous_scale='Teal')
+    fig3.update_layout(yaxis={'categoryorder':'total ascending'}, template="plotly_dark")
     st.plotly_chart(fig3, use_container_width=True)
     st.markdown("""
-    **Finding:** Getting nominated for an Oscar takes months of campaigning, but some people have managed to be 
-    nominated *multiple times* in a single ceremony (e.g., Best Director + Best Original Screenplay, or Best 
-    Actor + Best Supporting Actor). This chart shows the individuals who have pulled off this incredibly rare 
-    "Double Threat" feat the most times in their careers.
+    **Finding:** In Hollywood, it's easy to be a flash in the pan. The hardest thing to do is maintain 
+    relevance across generations. These are the artists who hold the record for the absolute longest 
+    career spans, navigating decades of shifting industry trends while remaining consistently Academy-worthy!
     """)
 
-    session.close()
 
 # ============================================================
 # Bonus: Did You Know?
@@ -366,21 +381,27 @@ elif tab == "🎲 Did You Know?":
 
     session = Session()
 
-    all_names = [r[0] for r in session.query(distinct(OscarNomination.name)).order_by(OscarNomination.name).all()]
+    # Filter out studios natively for the dropdown list too
+    ignore_words = [
+        'NAVY', 'ARMY', 'STUDIO', 'CORPORATION', 'FOX', 'MGM', 'METRO', 'WARNER',
+        'PARAMOUNT', 'DISNEY', '/', 'DEPARTMENT', 'PRODUCTIONS', 'ORCHESTRA'
+    ]
+    
+    raw_names = [r[0] for r in session.query(distinct(OscarNomination.name)).all()]
+    all_names = sorted([n for n in raw_names if not any(w in n.upper() for w in ignore_words)])
 
     if "dyk_name" not in st.session_state:
         st.session_state.dyk_name = "Meryl Streep" if "Meryl Streep" in all_names else all_names[0]
 
     def set_random_name():
         import random
-        # Exclude names that are uninteresting (1 nomination) to make facts more fun
         multi_noms = session.query(OscarNomination.name).group_by(OscarNomination.name).having(func.count(OscarNomination.id) > 1).all()
-        multi_list = [r[0] for r in multi_noms]
+        multi_list = sorted([r[0] for r in multi_noms if not any(w in r[0].upper() for w in ignore_words)])
         st.session_state.dyk_name = random.choice(multi_list) if multi_list else random.choice(all_names)
 
     col1, col2 = st.columns([3, 1])
     with col1:
-        # Autocomplete selectbox hooked into session_state!
+        # User input bound to session state
         name_input = st.selectbox("Select an actor/director for a fun fact:", options=all_names, key="dyk_name")
     with col2:
         st.write("")
@@ -388,47 +409,52 @@ elif tab == "🎲 Did You Know?":
         st.button("🎲 I'm Feeling Lucky", on_click=set_random_name, help="Randomly selects an interesting artist!")
 
     if name_input:
-        # Count this person's nominations
-        person_noms = session.query(func.count(OscarNomination.id)).filter(
-            OscarNomination.name == name_input
-        ).scalar()
+        person_noms = session.query(func.count(OscarNomination.id)).filter(OscarNomination.name == name_input).scalar()
 
         if person_noms == 0:
             st.warning(f"No Oscar data found for '{name_input}'")
         else:
-            person_wins = session.query(func.count(OscarNomination.id)).filter(
-                OscarNomination.name == name_input,
-                OscarNomination.winner == True
-            ).scalar()
-
-            # Compare to all nominees
-            all_nom_counts = session.query(
-                func.count(OscarNomination.id)
-            ).group_by(OscarNomination.name).all()
+            person_wins = session.query(func.count(OscarNomination.id)).filter(OscarNomination.name == name_input, OscarNomination.winner == True).scalar()
+            
+            # Percentile logic
+            all_nom_counts = session.query(func.count(OscarNomination.id)).group_by(OscarNomination.name).all()
             all_counts = sorted([x[0] for x in all_nom_counts])
             percentile = sum(1 for x in all_counts if x <= person_noms) / len(all_counts) * 100
 
-            # Get their categories
-            categories = session.query(distinct(OscarNomination.canon_category)).filter(
-                OscarNomination.name == name_input
-            ).all()
+            categories = session.query(distinct(OscarNomination.canon_category)).filter(OscarNomination.name == name_input).all()
             cat_list = [c[0] for c in categories]
 
-            # First and last year
-            first_year = session.query(func.min(OscarNomination.year_ceremony)).filter(
-                OscarNomination.name == name_input
-            ).scalar()
-            last_year = session.query(func.max(OscarNomination.year_ceremony)).filter(
-                OscarNomination.name == name_input
-            ).scalar()
+            first_year = session.query(func.min(OscarNomination.year_ceremony)).filter(OscarNomination.name == name_input).scalar()
+            last_year = session.query(func.max(OscarNomination.year_ceremony)).filter(OscarNomination.name == name_input).scalar()
             span = last_year - first_year
 
-            st.success(f"🌟 **Did You Know?** **{name_input}** has **{person_noms} nominations** — placing them in the top **{percentile:.0f}%** of all Oscar-nominated people in history!")
-            
-            # Formatted string logic
-            win_text = f"They have won **{person_wins} time(s)**, with a win rate of **{person_wins/person_noms*100:.1f}%**" if person_wins > 0 else "They have yet to secure an Oscar win"
-            st.markdown(f"🏆 {win_text}.")
-            st.markdown(f"📂 They have been recognized in: **{', '.join(cat_list)}**")
-            st.markdown(f"📅 Their Oscar career spans **{span} years** (from {first_year} to {last_year})")
+            # --- DYNAMIC RANDOM FACTS BANK ---
+            import random
+            facts = []
+
+            # Fact 1: Percentile & Win Rate
+            p_text = f"placing them in the top {percentile:.0f}% of all Oscar-nominated individuals in history" if percentile > 50 else "making them a celebrated member of the Academy's elite"
+            w_text = f"They have successfully converted those into {person_wins} win(s)!" if person_wins > 0 else "However, they have yet to secure a win."
+            facts.append(f"**{name_input}** has {person_noms} total nominations, {p_text}. {w_text}")
+
+            # Fact 2: Category Spread
+            if len(cat_list) > 1:
+                facts.append(f"Extremely versatile, **{name_input}** has been nominated across **{len(cat_list)} distinct Oscar categories** throughout their career! These include: {', '.join(cat_list)}.")
+            else:
+                facts.append(f"A master of their specific craft, **{name_input}** has built an incredible and focused legacy strictly in the **{cat_list[0]}** category across all {person_noms} of their nominations.")
+
+            # Fact 3: Career Longevity
+            if span > 10:
+                facts.append(f"**{name_input}** has had incredible career longevity! Their Oscar journey spans over **{span} years**, from their very first recognition in {first_year} all the way to {last_year}.")
+            elif span == 0 and person_noms > 1:
+                facts.append(f"**{name_input}** accomplished the extremely rare feat of receiving {person_noms} simultaneous nominations in a single year ({first_year})!")
+                
+            # Fact 4: Winning efficiency
+            if person_wins > 0 and person_wins == person_noms:
+                facts.append(f"**{name_input}** has a flawless 100% win rate at the Oscars! Every single time they were nominated ({person_noms} times), they walked away with the prestigious trophy.")
+
+            # Pick a random fact to display
+            selected_fact = random.choice(facts)
+            st.success(f"🌟 **Did You Know?**\n\n{selected_fact}")
 
     session.close()
