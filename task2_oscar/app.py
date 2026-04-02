@@ -56,15 +56,29 @@ def init_db():
 
     df = pd.read_csv(DATA_PATH)
     records = []
+    
+    # Name normalization mapping to fix dataset inconsistencies
+    corrections = {
+        "Daniel Day Lewis": "Daniel Day-Lewis",
+        "Donfeld": "Don Feld",
+        "Mikkel E.G. Nielsen": "Mikkel E. G. Nielsen"
+    }
+
     for _, row in df.iterrows():
         winner_val = str(row.get('winner', 'False')).strip().lower() in ['true', '1', 'yes']
+        
+        # Clean and normalize the name
+        raw_name = str(row['name']) if pd.notna(row['name']) else 'Unknown'
+        clean_name = " ".join(raw_name.strip().split())
+        clean_name = corrections.get(clean_name, clean_name)
+
         records.append(OscarNomination(
             year_film=int(row['year_film']) if pd.notna(row['year_film']) else 0,
             year_ceremony=int(row['year_ceremony']) if pd.notna(row['year_ceremony']) else 0,
             ceremony=int(row['ceremony']) if pd.notna(row.get('ceremony', None)) else None,
             category=str(row['category']),
             canon_category=str(row.get('canon_category', row['category'])),
-            name=str(row['name']) if pd.notna(row['name']) else 'Unknown',
+            name=clean_name,
             film=str(row['film']) if pd.notna(row['film']) else '',
             winner=winner_val
         ))
