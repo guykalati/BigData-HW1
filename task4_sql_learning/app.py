@@ -1,7 +1,7 @@
 """
-Task 4: SQL Learning Game — "SQL Spellcraft Academy"
-A wizard-themed, immersive SQL learning platform where learners cast "SQL spells"
-against a magical creatures database to progress through the Academy.
+Task 4: SQL Learning Game — "Hogwarts School of SQL & Wizardry"
+A Harry Potter-themed, immersive SQL learning platform where learners cast "SQL spells"
+against a magical creatures database to progress through the classes.
 """
 import streamlit as st
 import sqlite3
@@ -64,13 +64,13 @@ def init_db():
         (15,'Abyssal Kraken','Beast','Water',93,'Deep Ocean',1,'Morgana',998),
     ]
     wizards = [
-        (1,'Alaric the Bold','Pyromancers','Fire Magic','Archmage',45,8),
-        (2,'Seraphina Frost','Cryomancers','Ice Magic','Grand Wizard',38,6),
-        (3,'Theron Shade','Shadowcasters','Dark Magic','Master',29,5),
-        (4,'Elara Windwhisper','Aeromancers','Air Magic','Grand Wizard',35,4),
-        (5,'Borin Stonefist','Geomancers','Earth Magic','Master',42,7),
-        (6,'Morgana Depths','Hydromancers','Water Magic','Archmage',50,9),
-        (7,'Lyric Ember','Pyromancers','Fire Magic','Apprentice',12,3),
+        (1,'Harry Potter','Gryffindor','Defense Against the Dark Arts','Auror',15,8),
+        (2,'Draco Malfoy','Slytherin','Potions','Master',12,6),
+        (3,'Severus Snape','Slytherin','Dark Arts','Professor',29,5),
+        (4,'Hermione Granger','Gryffindor','Charms','Minister',15,4),
+        (5,'Cedric Diggory','Hufflepuff','Transfiguration','Prefect',7,7),
+        (6,'Luna Lovegood','Ravenclaw','Magizoology','Naturalist',14,9),
+        (7,'Ron Weasley','Gryffindor','Herbology','Auror',15,3),
     ]
     spells = [
         (1,'Fireball','Fire','Advanced',50,85,1),
@@ -205,7 +205,7 @@ def get_next_rank(xp):
 # ============================================================
 # Streamlit App
 # ============================================================
-st.set_page_config(page_title="SQL Spellcraft Academy", page_icon="🧙", layout="wide")
+st.set_page_config(page_title="Hogwarts SQL Academy", page_icon="⚡", layout="wide")
 
 st.markdown("""
 <style>
@@ -265,8 +265,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="main-title">🧙 SQL Spellcraft Academy</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Master the ancient art of SQL — one spell at a time</p>', unsafe_allow_html=True)
+st.markdown('''<div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Hogwarts_crest.svg/800px-Hogwarts_crest.svg.png" width="90">
+    <p class="main-title" style="margin:0;">Hogwarts School of SQL & Wizardry</p>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Hogwarts_crest.svg/800px-Hogwarts_crest.svg.png" width="90">
+</div>''', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Master the ancient art of SQL — one spell at a time ⚡</p>', unsafe_allow_html=True)
 
 # Initialize
 init_db()
@@ -433,7 +437,7 @@ else:
 
     if level_data is None:
         st.markdown('<p class="spell-cast">🎓🏆🎓</p>', unsafe_allow_html=True)
-        st.success("🎓 You have graduated from SQL Spellcraft Academy! You are now a fully certified Archmage!")
+        st.success("🎓 You have graduated from Hogwarts! You are now a fully certified Auror!")
         st.balloons()
         st.markdown(f"**Final XP:** {st.session_state['xp']}")
         st.markdown(f"**Rank:** {get_rank(st.session_state['xp'])[2]} {get_rank(st.session_state['xp'])[1]}")
