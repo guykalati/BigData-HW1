@@ -276,33 +276,23 @@ if tab == "⚔️ Battle Arena":
             
             def make_bar(label, val, color):
                 pct = min(100, (val / 200) * 100) # Cap at 200 for visual scaling
-                return f'''
-                <div class="stat-row">
-                    <div class="stat-label">{label}</div>
-                    <div class="stat-val">{val}</div>
-                    <div class="stat-bar-bg">
-                        <div class="stat-bar-fill" style="width: {pct}%; background: {color};"></div>
-                    </div>
-                </div>
-                '''
+                return f'<div class="stat-row"><div class="stat-label">{label}</div><div class="stat-val">{val}</div><div class="stat-bar-bg"><div class="stat-bar-fill" style="width: {pct}%; background: {color};"></div></div></div>'
 
-            html = f"""
-            <div class="pokemon-card" style="border-left-color: {team_color};">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <h3 style="margin:0; color:{team_color}; font-size: 1.4rem;">{team_emoji} {name}</h3>
-                    <div style="background: {team_color}22; color: {team_color}; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid {team_color}55;">
-                        {type_str}
-                    </div>
-                </div>
-                <hr style="margin:0 0 12px 0; border:none; height:1px; background:#ffffff11;">
-                {make_bar("HP", stats['hp'], "#FF5959")}
-                {make_bar("ATK", stats['attack'], "#F5AC78")}
-                {make_bar("DEF", stats['defense'], "#FAE078")}
-                {make_bar("SP.ATK", stats['sp_atk'], "#9DB7F5")}
-                {make_bar("SP.DEF", stats['sp_def'], "#A7DB8D")}
-                {make_bar("SPEED", stats['speed'], "#FA92B2")}
-            </div>
-            """
+            html = f"""<div class="pokemon-card" style="border-left-color: {team_color};">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+<h3 style="margin:0; color:{team_color}; font-size: 1.4rem;">{team_emoji} {name}</h3>
+<div style="background: {team_color}22; color: {team_color}; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid {team_color}55;">
+{type_str}
+</div>
+</div>
+<hr style="margin:0 0 12px 0; border:none; height:1px; background:#ffffff11;">
+{make_bar("HP", stats['hp'], "#FF5959")}
+{make_bar("ATK", stats['attack'], "#F5AC78")}
+{make_bar("DEF", stats['defense'], "#FAE078")}
+{make_bar("SP.ATK", stats['sp_atk'], "#9DB7F5")}
+{make_bar("SP.DEF", stats['sp_def'], "#A7DB8D")}
+{make_bar("SPEED", stats['speed'], "#FA92B2")}
+</div>"""
             st.markdown(html, unsafe_allow_html=True)
 
         with team1_col:
