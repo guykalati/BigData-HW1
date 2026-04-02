@@ -108,19 +108,25 @@ Each cheat modifies the actual database, not just Python variables. I also imple
 
 ### 4.1 Core Platform (15pt)
 
-I built Detective SQL: Case Files, a story-driven SQL learning game where the player takes on the role of a detective solving crimes by querying an evidence database. The platform includes:
+I built **SQL Spellcraft Academy**, an immersive wizard-themed SQL learning game where the player is an apprentice wizard who learns to "cast SQL spells" against a fantasy database of magical creatures, wizards, spells, and quests. The platform includes:
 
-A real SQLite database with four tables (suspects, crime_scenes, evidence, witnesses) filled with interconnected crime data that creates a coherent detective story. The learner writes and executes real SQL queries against this database. There are 7 progressive levels that teach SQL concepts in order: Level 1 (SELECT *), Level 2 (WHERE), Level 3 (ORDER BY & LIMIT), Level 4 (GROUP BY & COUNT), Level 5 (JOIN), Level 6 (combining all concepts), and Level 7 (multi-table joins and subqueries).
+A real SQLite database with four richly interconnected tables (`creatures`, `wizards`, `spells`, `quests`) filled with over 40 rows of fantasy-themed data. The learner writes and executes real SQL queries. There are **7 progressive levels** (called "Spell Scrolls") that teach SQL concepts in order: Scroll I (SELECT *), Scroll II (WHERE), Scroll III (ORDER BY & LIMIT), Scroll IV (GROUP BY & COUNT), Scroll V (JOIN), Scroll VI (multi-table JOIN + GROUP BY), and Scroll VII (HAVING & advanced aggregation).
 
-The feedback system checks whether the learner's query produces the correct number of rows and the right columns. If the query is wrong, the system provides specific guidance — not just "incorrect" but information about whether the row count is off, the columns are wrong, or the data does not match. After 3 failed attempts, the expected query is shown as a spoiler.
+The feedback system checks row counts, column names, and data correctness. If wrong, it provides specific guidance about whether the row count is off, the column set is wrong, or the data doesn't match. After 3 failed attempts, the correct query is revealed.
 
-Progress tracking shows which levels are completed with visual badges in the sidebar (completed, current, locked).
+Progress tracking is displayed visually in the sidebar with badge-style level indicators (✅ completed, 🔓 current, 🔒 locked).
 
 ### 4.2 Engagement & Creativity (10pt)
 
-To make the platform engaging, I went with a detective story theme where each level is a new "case file" that advances the narrative. The story starts with "Welcome, Detective! You've been assigned to the Cold Cases unit" and gradually increases in complexity as the learner builds skills.
+The platform is designed to be genuinely fun and memorable through multiple layers of engagement:
 
-Gamification features include a points system (100 points for first-try solutions, decreasing with attempts), a streak counter that rewards consecutive correct answers, and an achievements system with badges like "Rookie Detective" and "Senior Detective". The visual design uses dark theme cards with gold borders and italic story text to create an immersive atmosphere.
+- **Wizard Theme & Narrative:** Each level is a "Spell Scroll" with a rich story. Players progress from Novice Apprentice to Archmage, unlocking named spells (e.g., "Reveal All", "Focus Lens", "Soul Link", "Omni-Vision") as they master SQL concepts.
+- **XP & Rank System:** Instead of raw points, the game uses an RPG-style XP system with 6 progression ranks (Novice Apprentice → Spell Scribe → Junior Wizard → Enchanter → Grand Wizard → Archmage). A visual XP progress bar shows how close the player is to their next rank.
+- **Adaptive Difficulty:** If a player fails a level 2+ times, a more explicit "step-by-step" sub-hint is automatically revealed, guiding them through the query construction. This ensures beginners never get stuck. 
+- **Streak System:** Consecutive correct answers build a streak counter displayed in the sidebar, with special celebration messages at 3+ streaks.
+- **Sandbox Mode:** A free-practice "Spell Sandbox" tab lets learners experiment with any SQL query against the full database outside the structured curriculum.
+- **Trophy Room:** An achievements/badges system with 10 unique trophies that track progress milestones, XP thresholds, and streaks.
+- **Visual Design:** The entire UI uses a dark fantasy aesthetic with custom CSS (Cinzel serif font for headers, gradient cards, animated spell-cast effects, gold/purple color palette) to create an immersive RPG atmosphere.
 
 ---
 
