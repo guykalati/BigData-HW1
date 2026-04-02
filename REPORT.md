@@ -58,13 +58,13 @@ I handle edge cases like actors not found in the dataset (shows a warning), miss
 
 ### 2.3 Interesting Finds (10pt)
 
-**Finding 1: Most Nominations Without a Win.** Some talented nominees have been nominated many times but never won. This highlights how competitive the Oscars are and how winning depends on more than just talent — timing, competition, and industry politics all play a role.
+**Finding 1: The 'Flawless Record' (Never Lost).** While getting nominated is hard, winning is harder. I queried the database to find people who have been nominated multiple times (3+) but have incredibly never lost an Oscar race, maintaining a 100% win rate. 
 
-**Finding 2: Longest Wait Between First Nomination and First Win.** Some winners waited decades between their first nomination and eventual win. These delayed wins often feel like lifetime achievement recognition rather than a reward for a specific performance, and they show how the Academy's tastes evolve over time.
+**Finding 2: The Versatile Visionaries.** By grouping nominations by distinct categories, I found the most versatile artists in cinematic history. These are people who don't just act or direct, but have been nominated across a wide array of completely different categories (writing, producing, composing, etc.).
 
-**Finding 3: Most Competitive Categories.** Some categories have far more unique winners than others, making it harder for anyone to win twice. This reveals interesting dynamics about how the Academy distributes awards across different branches of filmmaking.
+**Finding 3: The 'Double Threat' Phenomenon.** Some artists have pulled off the incredibly rare feat of being nominated multiple times in the exact same year. I wrote a complex grouped query to identify who has achieved this "Double Threat" status the most times across their career.
 
-**Bonus: Did You Know?** I implemented a feature that generates personalized fun facts for any nominee. It calculates what percentile they rank in terms of nominations, shows their win rate, and summarizes their Oscar career span.
+**Bonus: Did You Know?** I implemented a feature that generates personalized fun facts for any nominee via an autocomplete search bar. It calculates what percentile they rank in terms of nominations, shows their win rate, and summarizes their Oscar career span. I also included an "I'm Feeling Lucky" button to randomly select an interesting artist.
 
 ---
 
