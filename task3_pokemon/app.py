@@ -179,10 +179,43 @@ st.markdown("""
         text-align: center;
     }
     .pokemon-card {
-        background: linear-gradient(135deg, #2d2d2d 0%, #1a1a2e 100%);
-        border-radius: 15px;
-        padding: 1rem;
-        border: 2px solid #FFD700;
+        background: linear-gradient(135deg, #1e1e2d 0%, #151521 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 5px solid #FFD700;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        margin-bottom: 1rem;
+    }
+    .stat-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 6px;
+        font-size: 0.85rem;
+    }
+    .stat-label {
+        width: 65px;
+        font-weight: 700;
+        color: #a0a0b0;
+        letter-spacing: 0.5px;
+    }
+    .stat-val {
+        width: 35px;
+        text-align: right;
+        margin-right: 12px;
+        font-family: monospace;
+        font-weight: bold;
+    }
+    .stat-bar-bg {
+        flex-grow: 1;
+        background: #2a2a35;
+        border-radius: 10px;
+        height: 10px;
+        overflow: hidden;
+    }
+    .stat-bar-fill {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.5s ease-in-out;
     }
     .battle-log {
         background: #0d1117;
@@ -220,28 +253,67 @@ if tab == "⚔️ Battle Arena":
                                      max_selections=3, default=[pokemon_list[0]] if pokemon_list else [])
     with col2:
         st.subheader("🔵 Player 2 (AI)")
-        p2_mode = st.radio("Opponent:", ["Random AI", "Choose Pokemon"])
+        p2_mode = st.radio("Opponent:", ["Random AI", "Choose Pokemon"], horizontal=True)
         if p2_mode == "Random AI":
-            if st.button("🎲 Randomize AI Team"):
+            if st.button("🎲 Randomize AI Team") or 'ai_team' not in st.session_state:
                 st.session_state['ai_team'] = random.sample(pokemon_list, min(3, len(p1_pokemon) if p1_pokemon else 1))
-            p2_pokemon = st.session_state.get('ai_team', random.sample(pokemon_list, min(3, len(p1_pokemon) if p1_pokemon else 1)))
-            st.write("AI Team:", ", ".join(p2_pokemon))
+            p2_pokemon = st.session_state['ai_team']
         else:
             p2_pokemon = st.multiselect("Select 1-3 Pokemon:", pokemon_list, key="p2",
                                          max_selections=3)
 
-    # Show selected Pokemon stats
-    if p1_pokemon:
+    # Show selected Pokemon stats with beautiful cards
+    if p1_pokemon or p2_pokemon:
         st.divider()
-        cols = st.columns(len(p1_pokemon))
-        for i, name in enumerate(p1_pokemon):
+        st.markdown("### 🏆 Team Lineups")
+        
+        team1_col, team2_col = st.columns(2)
+        
+        def render_pokemon_card(name, team_color, team_emoji):
             stats = get_pokemon_stats(name)
-            if stats:
-                with cols[i]:
-                    st.markdown(f"### 🔴 {name}")
-                    st.markdown(f"**Type:** {stats['type1']}" + (f" / {stats['type2']}" if stats['type2'] else ""))
-                    st.markdown(f"HP: {stats['hp']} | ATK: {stats['attack']} | DEF: {stats['defense']}")
-                    st.markdown(f"Sp.ATK: {stats['sp_atk']} | Sp.DEF: {stats['sp_def']} | SPD: {stats['speed']}")
+            if not stats: return
+            type_str = f"{stats['type1']}" + (f" / {stats['type2']}" if stats['type2'] else "")
+            
+            def make_bar(label, val, color):
+                pct = min(100, (val / 200) * 100) # Cap at 200 for visual scaling
+                return f'''
+                <div class="stat-row">
+                    <div class="stat-label">{label}</div>
+                    <div class="stat-val">{val}</div>
+                    <div class="stat-bar-bg">
+                        <div class="stat-bar-fill" style="width: {pct}%; background: {color};"></div>
+                    </div>
+                </div>
+                '''
+
+            html = f"""
+            <div class="pokemon-card" style="border-left-color: {team_color};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="margin:0; color:{team_color}; font-size: 1.4rem;">{team_emoji} {name}</h3>
+                    <div style="background: {team_color}22; color: {team_color}; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; border: 1px solid {team_color}55;">
+                        {type_str}
+                    </div>
+                </div>
+                <hr style="margin:0 0 12px 0; border:none; height:1px; background:#ffffff11;">
+                {make_bar("HP", stats['hp'], "#FF5959")}
+                {make_bar("ATK", stats['attack'], "#F5AC78")}
+                {make_bar("DEF", stats['defense'], "#FAE078")}
+                {make_bar("SP.ATK", stats['sp_atk'], "#9DB7F5")}
+                {make_bar("SP.DEF", stats['sp_def'], "#A7DB8D")}
+                {make_bar("SPEED", stats['speed'], "#FA92B2")}
+            </div>
+            """
+            st.markdown(html, unsafe_allow_html=True)
+
+        with team1_col:
+            st.markdown("<h4 style='color: #FF4444;'>🔴 Player 1 Squad</h4>", unsafe_allow_html=True)
+            for name in (p1_pokemon or []):
+                render_pokemon_card(name, "#FF4444", "🔴")
+                
+        with team2_col:
+            st.markdown("<h4 style='color: #4444FF;'>🔵 Player 2 Squad</h4>", unsafe_allow_html=True)
+            for name in (p2_pokemon or []):
+                render_pokemon_card(name, "#4444FF", "🔵")
 
     # Battle simulation
     if p1_pokemon and p2_pokemon and st.button("⚔️ START BATTLE!", type="primary"):
