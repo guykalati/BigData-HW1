@@ -72,6 +72,16 @@ def init_db():
         clean_name = " ".join(raw_name.strip().split())
         clean_name = corrections.get(clean_name, clean_name)
 
+        # Filter out multi-person teams (which use '/') and studios/companies
+        is_studio_or_team = any(x in clean_name.upper() for x in [
+            "STUDIO", "CORPORATION", "CENTURY", "COMPANY", "DEPARTMENT", 
+            "PRODUCTIONS", "PARAMOUNT", "UNIVERSAL", "WARNER", "ORCHESTRA",
+            "MGM", "RKO", "WALT DISNEY", "COLUMBIA", "PIC.", "PICTURES"
+        ])
+        
+        if "/" in clean_name or is_studio_or_team:
+            continue
+
         records.append(OscarNomination(
             year_film=int(row['year_film']) if pd.notna(row['year_film']) else 0,
             year_ceremony=int(row['year_ceremony']) if pd.notna(row['year_ceremony']) else 0,
