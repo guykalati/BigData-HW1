@@ -337,43 +337,59 @@ if nav == "📚 Grimoire (Schema)":
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("🐉 creatures")
-        st.code("""id              INTEGER  PRIMARY KEY
-name            TEXT     creature name
-species         TEXT     Bird/Dragon/Beast/...
-element         TEXT     Fire/Ice/Water/...
-power_level     INTEGER  strength rating
-habitat         TEXT     where it lives
-is_legendary    BOOLEAN  0 or 1
-discovered_by   TEXT     wizard who found it
-discovery_year  INTEGER  year discovered""")
+        st.markdown("""
+| Column | Type | Description |
+|:---|:---|:---|
+| **id** | `INTEGER` | PRIMARY KEY |
+| **name** | `TEXT` | creature name |
+| **species** | `TEXT` | Bird/Dragon/Beast/... |
+| **element** | `TEXT` | Fire/Ice/Water/... |
+| **power_level** | `INTEGER` | strength rating |
+| **habitat** | `TEXT` | where it lives |
+| **is_legendary** | `BOOLEAN` | `0` or `1` |
+| **discovered_by** | `TEXT` | wizard who found it |
+| **discovery_year** | `INTEGER` | year discovered |
+""")
 
         st.subheader("✨ spells")
-        st.code("""id          INTEGER  PRIMARY KEY
-name        TEXT     spell name
-element     TEXT     Fire/Ice/Water/...
-difficulty  TEXT     Beginner-Expert
-mana_cost   INTEGER  mana needed
-damage      INTEGER  damage dealt
-wizard_id   INTEGER  FK → wizards.id""")
+        st.markdown("""
+| Column | Type | Description |
+|:---|:---|:---|
+| **id** | `INTEGER` | PRIMARY KEY |
+| **name** | `TEXT` | spell name |
+| **element** | `TEXT` | Fire/Ice/Water/... |
+| **difficulty** | `TEXT` | Beginner / Intermediate / Expert |
+| **mana_cost** | `INTEGER` | mana needed |
+| **damage** | `INTEGER` | damage dealt |
+| **wizard_id** | `INTEGER` | FOREIGN KEY → `wizards.id` |
+""")
 
     with col2:
         st.subheader("🧙 wizards")
-        st.code("""id                INTEGER  PRIMARY KEY
-name              TEXT     wizard name
-house             TEXT     Hogwarts house (Gryffindor/Slytherin/...)
-specialty         TEXT     magic type
-rank              TEXT     Apprentice / Auror / Professor
-years_experience  INTEGER  years practicing
-creatures_tamed   INTEGER  creature count""")
+        st.markdown("""
+| Column | Type | Description |
+|:---|:---|:---|
+| **id** | `INTEGER` | PRIMARY KEY |
+| **name** | `TEXT` | wizard name |
+| **house** | `TEXT` | Hogwarts house |
+| **specialty** | `TEXT` | magic type |
+| **rank** | `TEXT` | Apprentice / Auror / Professor |
+| **years_experience** | `INTEGER` | years practicing |
+| **creatures_tamed** | `INTEGER` | creature count |
+""")
 
         st.subheader("⚔️ quests")
-        st.code("""id           INTEGER  PRIMARY KEY
-title        TEXT     quest name
-difficulty   TEXT     Easy / Medium / Hard / Legendary
-reward_gold  INTEGER  gold reward
-creature_id  INTEGER  FK → creatures.id
-wizard_id    INTEGER  FK → wizards.id
-completed    BOOLEAN  0 or 1""")
+        st.markdown("""
+| Column | Type | Description |
+|:---|:---|:---|
+| **id** | `INTEGER` | PRIMARY KEY |
+| **title** | `TEXT` | quest name |
+| **difficulty** | `TEXT` | Easy / Medium / Hard / Legendary |
+| **reward_gold** | `INTEGER` | gold reward |
+| **creature_id** | `INTEGER` | FOREIGN KEY → `creatures.id` |
+| **wizard_id** | `INTEGER` | FOREIGN KEY → `wizards.id` |
+| **completed** | `BOOLEAN` | `0` or `1` |
+""")
 
     st.divider()
     st.subheader("🔎 Data Preview")
