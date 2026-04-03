@@ -34,7 +34,7 @@ I discovered three patterns in the data:
 
 **Pattern 3: Explosion of Name Diversity.** The number of unique names per year grew from about 1,000 in 1880 to over 30,000 by 2014. This is not just from more babies being born — the ratio of unique names to total babies has increased dramatically. This reflects immigration bringing names from many cultures, parents inventing creative spellings, and a broader social acceptance of unconventional names.
 
-![Task 1 - Baby Names Explorer](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task1_baby_names_1775213293748.png)
+![Task 1 - Baby Names Explorer](demos/task1_screenshot.png)
 
 ---
 
@@ -67,6 +67,8 @@ I handle edge cases like actors not found in the dataset (shows a warning), miss
 **Finding 3: The 'Decade Dominators'.** I calculated which artists have earned nominations across the most distinct decades. Staying relevant in Hollywood for one decade is hard—these individuals proved their talent transcends generational trends by earning recognition across 4, 5, or even 6 different decades.
 
 **Bonus: Did You Know?** I implemented a feature that generates personalized fun facts for any nominee via an autocomplete search bar. It calculates what percentile they rank in terms of nominations, shows their win rate, and summarizes their Oscar career span. I also included an "I'm Feeling Lucky" button to randomly select an interesting artist.
+
+![Task 2 - Oscar Actor Explorer](demos/task2_screenshot.png)
 
 ---
 
@@ -104,6 +106,8 @@ Each cheat modifies the actual database, not just Python variables. I also imple
 
 **Finding 3: The Speed Tier Meta by Type.** In competitive battling, Speed is arguably the most critical stat as it dictates the tempo of the entire match. I created a sorted box-and-whisker plot analyzing the base speed distributions across all primary typings. This statistically proves that Electric and Flying types are fundamentally engineered by developers to out-speed the meta, whereas Steel and Rock types pay a heavy mathematical speed penalty in exchange for their type resistances.
 
+![Task 3 - Pokemon Battle Arena](demos/task3_screenshot.png)
+
 ---
 
 ## Task 4: SQL Learning Game (25pt)
@@ -130,10 +134,15 @@ The platform is designed to be genuinely fun and memorable through multiple laye
 - **Trophy Room:** An achievements/badges system with 10 unique trophies that track progress milestones, XP thresholds, and streaks.
 - **Visual Design:** The entire UI uses a dark fantasy aesthetic with custom CSS (Cinzel serif font for headers, gradient cards, animated spell-cast effects, gold/purple color palette) to create an immersive RPG atmosphere.
 
-![Spell Trials](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task4_spell_trials_1775213017321.png)
-![Trophy Room](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task4_trophy_room_1775213045193.png)
-![Sandbox Level](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task4_sandbox_1775213068565.png)
-![The Grimoire Schema](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task4_grimoire_1775212995941.png)
+![Spell Trials](demos/task4_spell_trials.png)
+![Trophy Room](demos/task4_trophy_room.png)
+![Sandbox Level](demos/task4_sandbox.png)
+![The Grimoire Schema](demos/task4_grimoire.png)
+
+### 📹 Gameplay Demo Video
+Watch a full end-to-end recording of casting the first spell, checking the Trophy Room, and reading the Grimoire below:
+
+![Task 4 Demo Gameplay](demos/task4_gameplay.webp)
 
 ---
 
