@@ -34,6 +34,8 @@ I discovered three patterns in the data:
 
 **Pattern 3: Explosion of Name Diversity.** The number of unique names per year grew from about 1,000 in 1880 to over 30,000 by 2014. This is not just from more babies being born — the ratio of unique names to total babies has increased dramatically. This reflects immigration bringing names from many cultures, parents inventing creative spellings, and a broader social acceptance of unconventional names.
 
+![Task 1 - Baby Names Explorer](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task1_baby_names_1775213293748.png)
+
 ---
 
 ## Task 2: Oscar Actor Explorer (25pt)
@@ -127,6 +129,11 @@ The platform is designed to be genuinely fun and memorable through multiple laye
 - **Sandbox Mode:** A free-practice "Spell Sandbox" tab lets learners experiment with any SQL query against the full database outside the structured curriculum.
 - **Trophy Room:** An achievements/badges system with 10 unique trophies that track progress milestones, XP thresholds, and streaks.
 - **Visual Design:** The entire UI uses a dark fantasy aesthetic with custom CSS (Cinzel serif font for headers, gradient cards, animated spell-cast effects, gold/purple color palette) to create an immersive RPG atmosphere.
+
+![Spell Trials](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task4_spell_trials_1775213017321.png)
+![Trophy Room](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task4_trophy_room_1775213045193.png)
+![Sandbox Level](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task4_sandbox_1775213068565.png)
+![The Grimoire Schema](/Users/gyklty/.gemini/antigravity/brain/7008817d-d15e-4e97-ad55-a39ca4947be6/task4_grimoire_1775212995941.png)
 
 ---
 
