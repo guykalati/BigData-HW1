@@ -135,14 +135,11 @@ The platform is designed to be genuinely fun and memorable through multiple laye
 - **Visual Design:** The entire UI uses a dark fantasy aesthetic with custom CSS (Cinzel serif font for headers, gradient cards, animated spell-cast effects, gold/purple color palette) to create an immersive RPG atmosphere.
 
 ![Spell Trials](demos/task4_spell_trials.png)
-![Trophy Room](demos/task4_trophy_room.png)
-![Sandbox Level](demos/task4_sandbox.png)
-![The Grimoire Schema](demos/task4_grimoire.png)
 
 ### 📹 Gameplay Demo Video
 Watch a full end-to-end recording of casting the first spell, checking the Trophy Room, and reading the Grimoire below:
 
-![Task 4 Demo Gameplay](demos/task4_gameplay.webp)
+![Task 4 Demo Gameplay](demos/task4_gameplay.gif)
 
 ---
 
