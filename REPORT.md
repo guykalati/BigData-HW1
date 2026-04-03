@@ -139,7 +139,7 @@ The platform is designed to be genuinely fun and memorable through multiple laye
 ### 📹 Gameplay Demo Video
 Watch a full end-to-end recording of casting the first spell, checking the Trophy Room, and reading the Grimoire below:
 
-![Task 4 Demo Gameplay](demos/task4_gameplay.gif)
+![Task 4 Demo Gameplay](demos/task4_gameplay.webp)
 
 ---
 
