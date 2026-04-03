@@ -64,7 +64,7 @@ I handle edge cases like actors not found in the dataset (shows a warning), miss
 
 **Finding 2: The Versatile Visionaries.** Using a category whitelist and an interactive treemap visualization, I identified artists who have been nominated across the most distinct Oscar categories. Click on any artist in the treemap to zoom into their category breakdown.
 
-**Finding 3: The 'Decade Dominators'.** I calculated which artists have earned nominations across the most distinct decades. Staying relevant in Hollywood for one decade is hard—these individuals proved their talent transcends generational trends by earning recognition across 4, 5, or even 6 different decades.
+**Finding 3: The 'Decade Dominators'.** I calculated which artists have earned nominations across the most distinct decades. Staying relevant in Hollywood for one decade is hard, these individuals proved their talent transcends generational trends by earning recognition across 4, 5, or even 6 different decades.
 
 **Bonus: Did You Know?** I implemented a feature that generates personalized fun facts for any nominee via an autocomplete search bar. It calculates what percentile they rank in terms of nominations, shows their win rate, and summarizes their Oscar career span. I also included an "I'm Feeling Lucky" button to randomly select an interesting artist.
 
@@ -96,15 +96,15 @@ I implemented five cheat codes, each one executing a real SQL write operation on
 - `LEGENDARY` — runs an INSERT to add a custom overpowered Pokemon called MewThree (stats of 500 across the board)
 - `NERF` — runs an UPDATE to halve all stats of every Pokemon except the selected one
 
-Each cheat modifies the actual database, not just Python variables. I also implemented a cheat audit system that can detect which cheats were used by checking for Pokemon with stats exceeding the dataset's natural maximums (e.g., HP above 255, Attack above 190). There is also a database reset button that removes the database file and reinitializes it from the original CSV.
+Each cheat modifies the actual database. I also implemented a cheat audit system that can detect which cheats were used by checking for Pokemon with stats exceeding the dataset's natural maximums (e.g., HP above 255, Attack above 190). There is also a database reset button that removes the database file and reinitializes it from the original CSV.
 
 ### 3.4 Pokemon Analysis (5pt)
 
-**Insight 1: Most Overpowered Type Combinations.** Dragon/Flying has the highest average total stats among dual-type combinations with at least 3 Pokemon. This makes sense because many Dragon types are pseudo-legendary or legendary Pokemon, which are designed to be rare and powerful.
+**Insight 1: Most Overpowered Type Combinations.** Dragon/Flying has the highest average total stats among dual-type combinations with at least 3 Pokemon. 
 
-**Finding 2: The "Glass Cannon" Index.** Approaching the game from a competitive meta perspective, I calculated a "Glassiness Ratio" comparing unadulterated offensive capabilities (Attack + Sp.Atk + Speed) against raw defensive capabilities (HP + Def + Sp.Def). Plotting this creates a fascinating visual index where extreme glass cannons (Gengar, Alakazam) cluster far away from extreme defensive walls (Shuckle, Blissey).
+**Finding 2: The "Glass Cannon" Index.** Approaching the game from a competitive meta perspective, I calculated a "Glassiness Ratio" comparing offensive capabilities (Attack + Sp.Atk + Speed) against raw defensive capabilities (HP + Def + Sp.Def). Plotting this creates a visual index where extreme glass cannons (Gengar, Alakazam) cluster far away from extreme defensive walls (Shuckle, Blissey).
 
-**Finding 3: The Speed Tier Meta by Type.** In competitive battling, Speed is arguably the most critical stat as it dictates the tempo of the entire match. I created a sorted box-and-whisker plot analyzing the base speed distributions across all primary typings. This statistically proves that Electric and Flying types are fundamentally engineered by developers to out-speed the meta, whereas Steel and Rock types pay a heavy mathematical speed penalty in exchange for their type resistances.
+**Finding 3: The Speed Tier Meta by Type.** In competitive battling, Speed is arguably the most critical stat as it dictates the tempo of the entire match. I created a sorted box-and-whisker plot analyzing the base speed distributions across all primary typings. 
 
 ![Task 3 - Pokemon Battle Arena](demos/task3_screenshot.png)
 
@@ -114,7 +114,7 @@ Each cheat modifies the actual database, not just Python variables. I also imple
 
 ### 4.1 Core Platform (15pt)
 
-I built **SQL Spellcraft Academy**, an immersive wizard-themed SQL learning game where the player is an apprentice wizard who learns to "cast SQL spells" against a fantasy database of magical creatures, wizards, spells, and quests. The platform includes:
+I built **SQL Spellcraft Academy**, a wizard-themed SQL learning game where the player is an apprentice wizard who learns to "cast SQL spells" against a fantasy database of magical creatures, wizards, spells, and quests. The platform includes:
 
 A real SQLite database with four richly interconnected tables (`creatures`, `wizards`, `spells`, `quests`) filled with over 40 rows of fantasy-themed data. The learner writes and executes real SQL queries. There are **7 progressive levels** (called "Spell Scrolls") that teach SQL concepts in order: Scroll I (SELECT *), Scroll II (WHERE), Scroll III (ORDER BY & LIMIT), Scroll IV (GROUP BY & COUNT), Scroll V (JOIN), Scroll VI (multi-table JOIN + GROUP BY), and Scroll VII (HAVING & advanced aggregation).
 
@@ -126,13 +126,13 @@ Progress tracking is displayed visually in the sidebar with badge-style level in
 
 The platform is designed to be genuinely fun and memorable through multiple layers of engagement:
 
-- **Wizard Theme & Narrative:** Each level is a "Spell Scroll" with a rich story. Players progress from Novice Apprentice to Archmage, unlocking named spells (e.g., "Reveal All", "Focus Lens", "Soul Link", "Omni-Vision") as they master SQL concepts.
+- **Wizard Theme & Narrative:** Players progress from Novice Apprentice to Archmage, unlocking named spells (e.g., "Reveal All", "Focus Lens") as they master SQL concepts.
 - **XP & Rank System:** Instead of raw points, the game uses an RPG-style XP system with 6 progression ranks (Novice Apprentice → Spell Scribe → Junior Wizard → Enchanter → Grand Wizard → Archmage). A visual XP progress bar shows how close the player is to their next rank.
 - **Adaptive Difficulty:** If a player fails a level 2+ times, a more explicit "step-by-step" sub-hint is automatically revealed, guiding them through the query construction. This ensures beginners never get stuck. 
 - **Streak System:** Consecutive correct answers build a streak counter displayed in the sidebar, with special celebration messages at 3+ streaks.
 - **Sandbox Mode:** A free-practice "Spell Sandbox" tab lets learners experiment with any SQL query against the full database outside the structured curriculum.
-- **Trophy Room:** An achievements/badges system with 10 unique trophies that track progress milestones, XP thresholds, and streaks.
-- **Visual Design:** The entire UI uses a dark fantasy aesthetic with custom CSS (Cinzel serif font for headers, gradient cards, animated spell-cast effects, gold/purple color palette) to create an immersive RPG atmosphere.
+- **Trophy Room:** An achievements system with 10 unique trophies that track progress milestones, XP thresholds, and streaks.
+- **Visual Design:** The entire UI uses a dark fantasy aesthetic.
 
 ![Spell Trials](demos/task4_spell_trials.png)
 
