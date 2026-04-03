@@ -60,7 +60,7 @@ I handle edge cases like actors not found in the dataset (shows a warning), miss
 
 ### 2.3 Interesting Finds (10pt)
 
-**Finding 1: The Biggest Snubs.** I filtered the database to only competitive categories (acting, directing, writing, cinematography) and found the individuals with the most nominations who have never won. These are the most heartbreaking stories in Oscar history—repeatedly recognized as among the best, yet the trophy always eluded them.
+**Finding 1: The Biggest Snubs.** I filtered the database to only few categories (acting, directing, writing, cinematography) and found the individuals with the most nominations who have never won. By the way, Paul Thomas Anderson just won an Oscar this year.
 
 **Finding 2: The Versatile Visionaries.** Using a category whitelist and an interactive treemap visualization, I identified artists who have been nominated across the most distinct Oscar categories. Click on any artist in the treemap to zoom into their category breakdown.
 
